@@ -1,0 +1,44 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.4.RELEASE'
+	id 'java'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.learnkafka'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+sourceSets {
+	test {
+		java.srcDirs = ['src/test/java/unit', 'src/test/java/intg', 'src/test/groovy/intg', 'src/test/groovy/unit']
+	}
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	compile 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'org.springframework.retry:spring-retry'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+
+	//lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// spock testing
+	testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.15'
+	testCompile('org.spockframework:spock-core:1.2-groovy-2.4')
+	testCompile 'org.spockframework:spock-spring:1.2-groovy-2.4'
+}

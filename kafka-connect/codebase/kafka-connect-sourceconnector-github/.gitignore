@@ -1,0 +1,7 @@
+.gradle/
+.idea/
+build/
+lamda-commons.iml
+out/
+.DS_Store
+application-test.yml

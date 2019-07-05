@@ -1,0 +1,21 @@
+{
+  "deliveryId": "12345",
+  "item": {
+    "itemId": 123,
+    "itemDescription": "Apple Ipad"
+  },
+  "pickUpAddress": {
+    "addressLine1": "123 ABC Ln",
+    "city": "Apple Valley",
+    "state": "MN",
+    "country": null,
+    "postalCode": "12345"
+  },
+  "dropAddresss": {
+    "addressLine1": "456 DEF Ln",
+    "city": "Minneapolis",
+    "state": "MN",
+    "country": null,
+    "postalCode": "55134"
+  }
+}
