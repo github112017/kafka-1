@@ -15,16 +15,11 @@ spring:
             identification:
               algorithm:
         value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    producer:
-      bootstrap-servers: localhost:9092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
     listener:
       poll-timeout: 3000
       concurrency: 1
       ack-mode: manual
-    retry:
-      generate-alert-retry-threshold: 3
-      backoff:
-        initial-interval: 10000
-        max-interval: 60000
+server:
+  port: 8081
+  main:
+    allow-bean-definition-overriding: true

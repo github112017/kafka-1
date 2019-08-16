@@ -1,7 +1,6 @@
 package com.learnkafka.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.learnkafka.dto.Delivery;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
@@ -13,7 +12,7 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
-
+import com.learnkafka.dto.Delivery;
 import java.util.ArrayList;
 import java.util.List;
 
