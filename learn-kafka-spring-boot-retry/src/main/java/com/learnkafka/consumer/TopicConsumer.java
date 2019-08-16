@@ -19,6 +19,7 @@ public class TopicConsumer {
         try {
             log.info("offset : {} , partition : {} " ,record.offset(), record.partition());
             log.info("Consumer Record read is : " + record);
+            log.info("Executing Thread : " + Thread.currentThread());
             parseRecordHeader(record);
             String readMessage = record.value();
             if (readMessage.equals(errorRecord)) {
@@ -26,14 +27,15 @@ public class TopicConsumer {
             }
             log.info("Message is  : " + readMessage);
         } catch (RuntimeException e) {
-            acknowledgment.acknowledge();  // commit even when in error so that the poisonous record wont be processed again.
             log.error("RuntimeException is : " + e);
             throw e;
         } catch (Exception e) {
             log.error("Exception is : " + e);
+        }finally {
+            acknowledgment.acknowledge(); // commits the offset to Kafka
+            log.info("Offset Commited");
         }
-        acknowledgment.acknowledge(); // commits the offset to Kafka
-        log.info("Offset Commited");
+
 
     }
 
