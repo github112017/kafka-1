@@ -1,4 +1,4 @@
-package com.learnkafka.learnkafkakotlinboot
+package com.learnkafka
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

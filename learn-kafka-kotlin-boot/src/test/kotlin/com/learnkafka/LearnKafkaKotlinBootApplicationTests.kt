@@ -1,4 +1,4 @@
-package com.learnkafka.learnkafkakotlinboot
+package com.learnkafka
 
 import org.junit.Test
 import org.junit.runner.RunWith
