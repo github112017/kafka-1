@@ -1,5 +1,6 @@
 package com.learnkafka.consmer
 
+import com.learnkafka.exception.MessageNoRetryException
 import com.learnkafka.service.MessageService
 import mu.KLogging
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -18,7 +19,9 @@ class MessageConsumer(@Autowired val messageService: MessageService) {
         try {
             logger.info("Record in onMessage : " + consumerRecord.value())
             messageService.processMessage(consumerRecord.value())
-        } catch (ex: Exception) {
+        } catch (ex: MessageNoRetryException) {
+            logger.error("MessageNoRetryException in onMessage : ", ex)
+        }catch (ex: Exception) {
             logger.error("Exception in onMessage : ", ex)
             throw ex
         } finally {
