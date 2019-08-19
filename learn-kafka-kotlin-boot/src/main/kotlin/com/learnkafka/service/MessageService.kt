@@ -2,6 +2,7 @@ package com.learnkafka.service
 
 import com.learnkafka.exception.MessageNoRetryException
 import mu.KLogging
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.stereotype.Service
 import java.lang.RuntimeException
 
@@ -21,6 +22,10 @@ class MessageService {
                 logger.info("Successfully processed the record : $message")
             }
         }
+    }
+
+    fun processRecovery(consumerRecord: ConsumerRecord<String, String>) {
+        logger.info("Recovery Logic Invoked")
     }
 
     companion object : KLogging()
