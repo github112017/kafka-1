@@ -31,8 +31,10 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.springframework.kafka:spring-kafka")
+	implementation ("org.springframework.retry:spring-retry")
 
-    //
+
+	//
     implementation("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
 
