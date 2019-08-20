@@ -9,17 +9,18 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
-import java.lang.Long
 
 @Component
 class MessageConsumer(@Autowired val messageService: MessageService,
                       @Autowired val consumerRetryListener: MessageConsumerRetryListener) {
 
     @Value("\${spring.kafka.retry.generate-alert-retry-threshold}")
-    lateinit var maxRetries: Long
+    var maxRetries: kotlin.Long =0
+
 
     @KafkaListener(id = "test-topic", topics = ["\${spring.kafka.consumer.topic}"],containerFactory = "deliveryConsumerContainerFactory")
     fun onMessage(consumerRecord: ConsumerRecord<String, String>, acknowledgement: Acknowledgment) {
+
 
         try {
             logger.info("Record in onMessage : " + consumerRecord.value())
@@ -40,7 +41,8 @@ class MessageConsumer(@Autowired val messageService: MessageService,
 
 
    fun invokeRecovery(consumerRecord: ConsumerRecord<String, String>){
-        if(consumerRetryListener.retryCount == maxRetries.toInt()){
+       logger.info("maxRetries: $maxRetries , retryCount : ${consumerRetryListener.retryCount} ")
+        if(consumerRetryListener.retryCount == (maxRetries.toInt()-1)){ // retry index starts with 0, so we are reducing the maxretries by 1.
             messageService.processRecovery(consumerRecord)
         }
     }
