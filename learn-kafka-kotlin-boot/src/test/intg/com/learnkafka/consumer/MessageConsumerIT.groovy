@@ -44,6 +44,7 @@ class MessageConsumerIT extends Specification {
         ProducerRecord<String, String> producerRecord = new ProducerRecord<>("test-topic", "my-aggregate-id", "my-test-value")
         template.send(producerRecord)
         boolean result = true
+        Thread.sleep(sleepTime)
 
         then:
         result == true

@@ -12,7 +12,6 @@ import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.retry.backoff.FixedBackOffPolicy
 import org.springframework.retry.policy.SimpleRetryPolicy
 import org.springframework.retry.support.RetryTemplate
-import java.lang.Long
 
 
 @Configuration
@@ -20,7 +19,7 @@ import java.lang.Long
 class ConsumerConfig(@Autowired val consumerRetryListener: MessageConsumerRetryListener) {
 
     @Value("\${spring.kafka.retry.backoff.initial-interval}")
-    lateinit var initialBackoffInterval: Long
+     var initialBackoffInterval: Long = 0
 
     @Value("\${spring.kafka.retry.generate-alert-retry-threshold}")
     lateinit var maxRetries: Integer
