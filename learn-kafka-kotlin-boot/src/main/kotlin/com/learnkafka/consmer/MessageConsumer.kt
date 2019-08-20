@@ -10,6 +10,7 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
 import java.lang.Long
+import java.util.concurrent.CountDownLatch
 
 @Component
 class MessageConsumer(@Autowired val messageService: MessageService,
@@ -18,8 +19,11 @@ class MessageConsumer(@Autowired val messageService: MessageService,
     @Value("\${spring.kafka.retry.generate-alert-retry-threshold}")
     lateinit var maxRetries: Long
 
+
+
     @KafkaListener(id = "test-topic", topics = ["\${spring.kafka.consumer.topic}"],containerFactory = "deliveryConsumerContainerFactory")
     fun onMessage(consumerRecord: ConsumerRecord<String, String>, acknowledgement: Acknowledgment) {
+
 
         try {
             logger.info("Record in onMessage : " + consumerRecord.value())

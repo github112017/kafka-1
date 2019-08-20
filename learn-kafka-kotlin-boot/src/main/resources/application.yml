@@ -5,8 +5,8 @@ spring:
     bootstrap-servers: localhost:9092
     consumer:
       topic: test-topic
-      group-id: my-first-topic-group
-      auto-offset-reset: latest
+      group-id: test-topic
+      auto-offset-reset: earliest
       enable-auto-commit: false
       properties:
         session.timeout.ms: 15000
