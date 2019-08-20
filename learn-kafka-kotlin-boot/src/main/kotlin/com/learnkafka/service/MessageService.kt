@@ -14,7 +14,7 @@ class MessageService {
     fun processMessage(message : String) {
         val poisonousRecord = "5"
         val noRetryPoisionousRecord = "6"
-
+        logger.info("Message in processMessage : $message")
         when (message) {
             poisonousRecord -> throw RuntimeException("Exception Throwm")
             noRetryPoisionousRecord -> throw MessageNoRetryException("No Retry Exception")

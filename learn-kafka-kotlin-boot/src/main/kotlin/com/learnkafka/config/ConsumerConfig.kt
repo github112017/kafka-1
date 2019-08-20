@@ -22,7 +22,7 @@ class ConsumerConfig(@Autowired val consumerRetryListener: MessageConsumerRetryL
      var initialBackoffInterval: Long = 0
 
     @Value("\${spring.kafka.retry.generate-alert-retry-threshold}")
-    lateinit var maxRetries: Integer
+     var maxRetries: Long=0
 
 
     @Bean
