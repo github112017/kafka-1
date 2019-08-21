@@ -54,6 +54,7 @@ class MessageConsumerIT extends Specification {
 
         then:
         count * messageServiceMock.processMessage(message) >> null
+        0 * messageServiceMock.processRecovery(message) >> null
 
         where:
         message | count
