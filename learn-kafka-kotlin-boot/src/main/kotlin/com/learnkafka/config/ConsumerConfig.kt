@@ -41,7 +41,7 @@ class ConsumerConfig(@Autowired val consumerRetryListener: MessageConsumerRetryL
         factory.setRetryTemplate(retryTemplate())
         factory.setRecoveryCallback {
             it.attributeNames().forEach { logger.info("Attributes : $it" ) }
-            logger.info("record in the recovery block " + it.getAttribute("record"))
+            logger.info("record in the recovery block : " + it.getAttribute("record"))
             messageService.processRecovery(it.getAttribute("record") as ConsumerRecord<String, String>)
         }
         return factory
