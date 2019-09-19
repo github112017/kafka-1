@@ -1,6 +1,9 @@
 package com.learnkafka.config
 
 import com.learnkafka.consmer.MessageConsumerRetryListener
+import com.learnkafka.service.MessageService
+import mu.KLogging
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer
@@ -16,13 +19,16 @@ import org.springframework.retry.support.RetryTemplate
 
 @Configuration
 @EnableKafka
-class ConsumerConfig(@Autowired val consumerRetryListener: MessageConsumerRetryListener) {
+class ConsumerConfig(@Autowired val consumerRetryListener: MessageConsumerRetryListener,
+                     @Autowired val messageService : MessageService) {
 
     @Value("\${spring.kafka.retry.backoff.initial-interval}")
      var initialBackoffInterval: Long = 0
 
     @Value("\${spring.kafka.retry.generate-alert-retry-threshold}")
      var maxRetries: Long=0
+
+
 
 
     @Bean
@@ -33,6 +39,11 @@ class ConsumerConfig(@Autowired val consumerRetryListener: MessageConsumerRetryL
         val factory = ConcurrentKafkaListenerContainerFactory<Any, Any>()
         configurer.configure(factory, kafkaConsumerFactory as ConsumerFactory<Any, Any>)
         factory.setRetryTemplate(retryTemplate())
+        factory.setRecoveryCallback {
+            it.attributeNames().forEach { logger.info("Attributes : $it" ) }
+            logger.info("record in the recovery block : " + it.getAttribute("record"))
+            messageService.processRecovery(it.getAttribute("record") as ConsumerRecord<String, String>)
+        }
         return factory
     }
 
@@ -67,5 +78,6 @@ class ConsumerConfig(@Autowired val consumerRetryListener: MessageConsumerRetryL
         return backOffPolicy
     }
 
+    companion object : KLogging()
 
 }

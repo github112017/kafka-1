@@ -33,7 +33,7 @@ class MessageConsumer(@Autowired var messageService: MessageService,
         } finally {
             acknowledgement.acknowledge()
             logger.info("Retry Count is ${consumerRetryListener.retryCount}.")
-            invokeRecovery(consumerRecord)
+          //  invokeRecovery(consumerRecord)
             logger.info("OffSet Commmited! Message Partition is ${consumerRecord.partition()} and the offset Value is :  ${consumerRecord.offset()}")
         }
 
