@@ -4,10 +4,14 @@ import com.learnkafka.consmer.MessageConsumer
 import com.learnkafka.consmer.MessageConsumerRetryListener
 import com.learnkafka.service.MessageService
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.metrics.stats.Count
 import org.spockframework.spring.SpringBean
+import org.spockframework.spring.SpringSpy
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry
 import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.listener.MessageListenerContainer
 import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
@@ -15,9 +19,13 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
+import org.springframework.kafka.test.utils.ContainerTestUtils
 
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.logging.Logger
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -27,20 +35,31 @@ import java.util.concurrent.TimeUnit
         "spring.kafka.retry.backoff.initial-interval=500"])
 class MessageConsumerIT extends Specification {
 
-    @Autowired
-    private EmbeddedKafkaBroker embeddedKafka
+    Logger logger = Logger.getLogger(MessageConsumerIT.class.name)
+
 
     @Autowired
-    MessageConsumerRetryListener messageConsumerRetryListener
+    private EmbeddedKafkaBroker embeddedKafkaBroker
+
+
+    @Autowired
+    KafkaListenerEndpointRegistry registry
 
     @Autowired
     private KafkaTemplate<String, String> template;
 
+    @SpringSpy
+    MessageConsumer deliveryConsumer
+
     @SpringBean
     MessageService messageServiceMock = Mock(MessageService.class)
 
-    @Autowired
-    MessageConsumer messageConsumer
+    def "setup"() {
+
+        for (MessageListenerContainer container : registry.getListenerContainers()) {
+            ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic())
+        }
+    }
 
     def "Integration test for MessageConsumer"() {
 
@@ -53,8 +72,10 @@ class MessageConsumerIT extends Specification {
         latch.await(3, TimeUnit.SECONDS)
 
         then:
+        logger.info("inside then block")
         count * messageServiceMock.processMessage(message) >> null
         0 * messageServiceMock.processRecovery(message) >> null
+
 
         where:
         message | count
@@ -81,4 +102,6 @@ class MessageConsumerIT extends Specification {
         "5"     | 1
 
     }
+
+
 }

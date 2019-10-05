@@ -37,6 +37,7 @@ class MessageConsumer(@Autowired var messageService: MessageService,
             logger.info("OffSet Commmited! Message Partition is ${consumerRecord.partition()} and the offset Value is :  ${consumerRecord.offset()}")
         }
 
+        Thread.sleep(5000)
     }
 
 
