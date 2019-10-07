@@ -64,42 +64,42 @@ class MessageConsumerIT extends Specification {
     def "Integration test for MessageConsumer"() {
 
         given:
-        ProducerRecord<String, String> producerRecord = new ProducerRecord<>("test-topic", "my-aggregate-id", message)
-        def latch = new CountDownLatch(1)
+            ProducerRecord<String, String> producerRecord = new ProducerRecord<>("test-topic", "my-aggregate-id", message)
+            def latch = new CountDownLatch(1)
 
         when:
-        template.send(producerRecord)
-        latch.await(3, TimeUnit.SECONDS)
+            template.send(producerRecord)
+            latch.await(3, TimeUnit.SECONDS)
 
         then:
-        logger.info("inside then block")
-        count * messageServiceMock.processMessage(message) >> null
-        0 * messageServiceMock.processRecovery(message) >> null
+            logger.info("inside then block")
+            count * messageServiceMock.processMessage(message) >> null
+            0 * messageServiceMock.processRecovery(message) >> null
 
 
         where:
-        message | count
-        "3"     | 1
+            message | count
+            "3"     | 1
 
     }
 
     def "Integration test for MessageConsumer - Exception Scenario"() {
 
         given:
-        ProducerRecord<String, String> producerRecord = new ProducerRecord<>("test-topic", "my-aggregate-id", message)
-        messageServiceMock.processMessage(_) >> { throw new RuntimeException("Exception thrown") }
-        def latch = new CountDownLatch(1)
+            ProducerRecord<String, String> producerRecord = new ProducerRecord<>("test-topic", "my-aggregate-id", message)
+            messageServiceMock.processMessage(_) >> { throw new RuntimeException("Exception thrown") }
+            def latch = new CountDownLatch(1)
 
         when:
-        template.send(producerRecord)
-        latch.await(3, TimeUnit.SECONDS)
+            template.send(producerRecord)
+            latch.await(3, TimeUnit.SECONDS)
 
         then:
-        count * messageServiceMock.processRecovery(_)
+            count * messageServiceMock.processRecovery(_)
 
         where:
-        message | count
-        "5"     | 1
+            message | count
+            "5"     | 1
 
     }
 
