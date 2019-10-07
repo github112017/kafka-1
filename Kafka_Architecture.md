@@ -1,5 +1,11 @@
 # Internals of Apache kafka
 
+# What is Kafka ?
+- Kafka is a **distributed stream processing** system.
+- What is stream processing ?
+  - Application's working on the data as it arrives to the system.
+  - It is the ability of the application to act on the infinite streams of data with continuous computation as it arrives to the system.
+  .
 ## Topic
 
 - **Topic** in kafka is an Entity and there is a name attached to it.
@@ -34,5 +40,17 @@
 ### How Kafka Create Command Works?
 
 - When a create command is issued the following steps will happen before the Topic is created.
-  - The call first goes to the **Zookeeper**. Because the zookeeper has the complete information about the Kafka brokers information.34                                          
-  -
+  - The call first goes to the **Zookeeper**. Because the zookeeper has the complete information about the Kafka brokers in the cluster.
+  - If the topic request is for multiple paritions then Zookeeper elects the leader gor each partition from the available brokers and assign  the patitions of the specific topic.
+
+### Fault Tolerance - Replication Factor
+- Fault Tolerance is achieved by configuring the replication factor.
+- Replication factor decides how many number of replications of the same data is available.
+  - This is to make sure that the data is not lost in the event of the broker crash or failure.
+  - Minimum of 2 or 3 is recommended.
+  - This is configured on a topic basis.
+
+
+#### ISR (In Sync Replica)
+- When the data is replicated in the available brokers as per value of the replication factor then this state is called **Quorum**.
+- This provides resiliency to the Kafka topic in the event of a failure.
