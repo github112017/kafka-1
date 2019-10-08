@@ -32,11 +32,6 @@
 - A Kafka topic thats created in a broker can span to multiple brokers based on the number of partitions.
     - Each topic in general has more than one partition so each partition has a log file.
 
-### Kafka Producer
-- A producer in Kafka writes the message to the topic.
-- A message that gets sent to a specific partition is decided by the partition logic thats present at the producer end.
-  - By default the **Paritioning** scheme is **round-robin**
-
 ### How Kafka Create Command Works?
 
 - When a create command is issued the following steps will happen before the Topic is created.
@@ -54,3 +49,13 @@
 #### ISR (In Sync Replica)
 - When the data is replicated in the available brokers as per value of the replication factor then this state is called **Quorum**.
 - This provides resiliency to the Kafka topic in the event of a failure.
+
+### Kafka Producer
+- A producer in Kafka writes the message to the topic.
+- A message that gets sent to a specific partition is decided by the partition logic thats present at the producer end.
+  - By default the **Paritioning** scheme is **round-robin**
+
+#### Message serialization:
+- All the messages are encoded as binary inside the Kafka Broker. So the key and value takes care of generating the binary(encoding technique) using the specified serialization techniques.  
+- This is not just for the network transport. This helps to achieve storage and compression.
+- The whole lifecycle of the message starts with the producer.
