@@ -1,7 +1,7 @@
 # Internals of Apache kafka
 
 # What is Kafka ?
-- Kafka is a **distributed stream processing** system.
+- Kafka is a **distributed stream processing** system. Read this link - https://kafka.apache.org/intro .
 - What is stream processing ?
   - Application's working on the data as it arrives to the system.
   - It is the ability of the application to act on the infinite streams of data with continuous computation as it arrives to the system.
@@ -21,7 +21,7 @@
   - timestamp
   - Unique Identifier
   - payload(binary)
-  - Offset
+  - Offset - The records in the partitions are each assigned a sequential id number called the **offset** that uniquely identifies each record within the partition.
 - Kafka messages are retained in the machine where the Kakfa is installed and its persisted in a file system.
   - **Messsages** are kept in the file system based on the configurable retention period.
   - **Retention period** is based on the per topic basis.  
