@@ -1,7 +1,12 @@
 # Internals of Apache kafka
 
+# Why Kafka ?
+
 # What is Kafka ?
 - Kafka is a **distributed stream processing** system. Read this link - https://kafka.apache.org/intro .
+  - Publish and subscribe to streams of records, similar to a message queue or enterprise messaging system
+  - Store streams of records in a fault-tolerant durable way
+  - Process streams of records as they occur.
 - What is stream processing ?
   - Application's working on the data as it arrives to the system.
   - It is the ability of the application to act on the infinite streams of data with continuous computation as it arrives to the system.
@@ -52,6 +57,32 @@
 
 ### Kafka Producer
 - A producer in Kafka writes the message to the topic.
+- When the send() method is invoked, below are the steps that are performed.
+  - Producer will reach out to the cluster and fetches the **metadata**. This data is always upto date as the producer invokes updates the metadata everytime a call is made to the producer.
+  - Serializer -> Partitioner -> RecordAccumulator
+  - Serializer : Serializes the message.
+  - Partitioner : Determines the partition to which the message needs to be posted
+    - direct  : Partition number is mentioned as part of the **send** call itself.
+    - roundrobin  : If no key or partition is mentioned, then the **round-robin** will be used.
+    - key-mod hash  : Applies murmur hash of the key and applies the modulus function of the number of partitions.
+    ```
+    murmurhash/3(no of paritions)
+    ```
+    - CustomPartitioner  : Own partitioning scheme to determine the partition of the topic.
+ -  RecordAccumulator : InMemory Queue like data-structure.      
+    - Each send invocation in general will require a resource overhead.
+    - Kafka uses the concept of a **microbatch** for :
+      - Producer
+      - Writing
+      - Consumer
+   - There is a **RecordBatch** for each TopicParition in the **RecordAccumulator**.
+   -  **RecordBatch**
+    - Each RecordBatch has a limit on how many records it can buffer.
+      - There is a global **buffer.memory** property value which is a threshold value of how much memory can be used to buffer across all RecordBath that are waiting to be sent to the Kafka broker. This also represented as number of bytes.
+      - 
+
+
+
 - A message that gets sent to a specific partition is decided by the partition logic thats present at the producer end.
   - By default the **Paritioning** scheme is **round-robin**
 
