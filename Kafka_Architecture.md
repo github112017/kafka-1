@@ -85,10 +85,25 @@
   - There is a global **buffer.memory** property value which is a threshold value of how much memory can be used to buffer across all RecordBath that are waiting to be sent to the Kafka broker. This also represented as number of bytes.
 
 #### When Records are sent to the server?
-
-- When the **batch.size** is met then the records are immediately sent to the server.
-- If the **batch.size** is not met then there is another configuration setting called **linger.ms**
+**batch.size:**  
+  - When the **batch.size** is met then the records are immediately sent to the server.
+**linger.ms:**  
+  - If the **batch.size** is not met then there is another configuration setting called **linger.ms**
   - It represents the number of milli seconds the unfilled buffer should wait before writing to the server.
+**max.block.ms**
+  - If records are sent faster than they can be delivered to the server, then the producer will block for **max.block.ms** after which it will throw an exception.
+
+#### Delivery Guarantees
+
+- **acks** - Broker Acknowledgment
+  - 0 -> Fire and Forget
+  - 1 -> Leader Acknowledged
+  - 2 -> replication quorum acknowledged.
+
+- **retries** - No of times that you would like to retry.
+**delivery.timeout.ms** - 
+- **retry.backoff.ms**  - wait for the retry before every attempt.
+
 
 #### Message serialization:
 - All the messages are encoded as binary inside the Kafka Broker. So the key and value takes care of generating the binary(encoding technique) using the specified serialization techniques.  
