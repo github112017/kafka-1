@@ -61,30 +61,34 @@
   - Producer will reach out to the cluster and fetches the **metadata**. This data is always upto date as the producer invokes updates the metadata everytime a call is made to the producer.
   - Serializer -> Partitioner -> RecordAccumulator
   - Serializer : Serializes the message.
-  - Partitioner : Determines the partition to which the message needs to be posted
-    - direct  : Partition number is mentioned as part of the **send** call itself.
-    - roundrobin  : If no key or partition is mentioned, then the **round-robin** will be used.
-    - key-mod hash  : Applies murmur hash of the key and applies the modulus function of the number of partitions.
+#### Partitioning Scheme
+- A message that gets sent to a specific partition is decided by the partition logic thats present at the producer end.
+  - By default the **Paritioning** scheme is **round-robin**
+- Partitioner : Determines the partition to which the message needs to be posted
+  - direct  : Partition number is mentioned as part of the **send** call itself.
+  - roundrobin  : If no key or partition is mentioned, then the **round-robin** will be used.
+  - key-mod hash  : Applies murmur hash of the key and applies the modulus function of the number of partitions.
     ```
     murmurhash/3(no of paritions)
     ```
-    - CustomPartitioner  : Own partitioning scheme to determine the partition of the topic.
- -  RecordAccumulator : InMemory Queue like data-structure.      
-    - Each send invocation in general will require a resource overhead.
-    - Kafka uses the concept of a **microbatch** for :
-      - Producer
-      - Writing
-      - Consumer
-   - There is a **RecordBatch** for each TopicParition in the **RecordAccumulator**.
-   -  **RecordBatch**
-    - Each RecordBatch has a limit on how many records it can buffer.
-      - There is a global **buffer.memory** property value which is a threshold value of how much memory can be used to buffer across all RecordBath that are waiting to be sent to the Kafka broker. This also represented as number of bytes.
-      - 
+  - CustomPartitioner  : Own partitioning scheme to determine the partition of the topic.
 
+#### RecordAccumulator : InMemory Queue like data-structure.      
+- Each send invocation in general will require a resource overhead.
+- Kafka uses the concept of a **microbatch** for :
+  - Producer
+  - Writing
+  - Consumer
+- There is a **RecordBatch** for each TopicParition in the **RecordAccumulator**.
+-  **RecordBatch**
+  - Each RecordBatch has a limit on how many records it can buffer and is determined by the **batch.size** property.
+  - There is a global **buffer.memory** property value which is a threshold value of how much memory can be used to buffer across all RecordBath that are waiting to be sent to the Kafka broker. This also represented as number of bytes.
 
+#### When Records are sent to the server?
 
-- A message that gets sent to a specific partition is decided by the partition logic thats present at the producer end.
-  - By default the **Paritioning** scheme is **round-robin**
+- When the **batch.size** is met then the records are immediately sent to the server.
+- If the **batch.size** is not met then there is another configuration setting called **linger.ms**
+  - It represents the number of milli seconds the unfilled buffer should wait before writing to the server.
 
 #### Message serialization:
 - All the messages are encoded as binary inside the Kafka Broker. So the key and value takes care of generating the binary(encoding technique) using the specified serialization techniques.  
