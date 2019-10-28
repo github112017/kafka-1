@@ -6,6 +6,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class MessageProducer {
 
@@ -17,7 +18,7 @@ public class MessageProducer {
         kafkaProducer = new KafkaProducer(props);
 
     }
-    public RecordMetadata publishMessae(String key, String message){
+    public RecordMetadata publishMessageSync(String key, String message){
 
         ProducerRecord<String,String> producerRecord = new ProducerRecord<>(topicName, key, message);
         RecordMetadata recordMetadata=null;
@@ -31,5 +32,14 @@ public class MessageProducer {
             e.printStackTrace();
         }
         return recordMetadata;
+    }
+
+    public Future<RecordMetadata> publishMessageASync(String key, String message){
+
+        ProducerRecord<String,String> producerRecord = new ProducerRecord<>(topicName, key, message);
+        RecordMetadata recordMetadata=null;
+
+            return kafkaProducer.send(producerRecord);
+
     }
 }

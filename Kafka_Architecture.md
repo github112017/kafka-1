@@ -55,7 +55,7 @@
 - When the data is replicated in the available brokers as per value of the replication factor then this state is called **Quorum**.
 - This provides resiliency to the Kafka topic in the event of a failure.
 
-### Kafka Producer
+## Kafka Producer
 - A producer in Kafka writes the message to the topic.
 - When the send() method is invoked, below are the steps that are performed.
   - Producer will reach out to the cluster and fetches the **metadata**. This data is always upto date as the producer invokes updates the metadata everytime a call is made to the producer.
@@ -99,13 +99,24 @@
   - 0 -> Fire and Forget
   - 1 -> Leader Acknowledged
   - 2 -> replication quorum acknowledged.
+    - This method assures the data is replicated in the all the clusters but there is a performance impact to this option.
 
 - **retries** - No of times that you would like to retry.
-**delivery.timeout.ms** - 
+**delivery.timeout.ms** -
 - **retry.backoff.ms**  - wait for the retry before every attempt.
 
+#### Ordering Guarantees
+- The ordering is guaranteed only at the partition level.
+- If an error occurred for a given message and the following messages that were published were successful. In this case there is a possibility that the order can go our of sync.  
+- **max.in.flight.request.per.connection** - If the value of this property is set as **1** then its possible to achieve ordering. But this is the not the recommended option as it will cause other performance related issues.
 
 #### Message serialization:
 - All the messages are encoded as binary inside the Kafka Broker. So the key and value takes care of generating the binary(encoding technique) using the specified serialization techniques.  
 - This is not just for the network transport. This helps to achieve storage and compression.
 - The whole lifecycle of the message starts with the producer.
+
+#### Things to Do (Kafka Producer)
+
+- Write CustomPartitioner
+- Write CustomSerializer
+- Compression of messages

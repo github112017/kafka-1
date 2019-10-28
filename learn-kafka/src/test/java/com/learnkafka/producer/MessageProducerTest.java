@@ -9,6 +9,10 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -28,7 +32,16 @@ public class MessageProducerTest {
 
     @Test
     public void publishMessage(){
-        RecordMetadata recordMetadata = messageProducer.publishMessae(null, "123");
+        RecordMetadata recordMetadata = messageProducer.publishMessageSync(null, "123");
+        System.out.println(recordMetadata.partition());
+        assertNotNull(recordMetadata);
+
+    }
+
+    @Test
+    public void publishMessageASync() throws InterruptedException, ExecutionException, TimeoutException {
+        Future<RecordMetadata> recordMetadataFuture = messageProducer.publishMessageASync(null, "123");
+        RecordMetadata  recordMetadata = recordMetadataFuture.get(3, TimeUnit.SECONDS);
         System.out.println(recordMetadata.partition());
         assertNotNull(recordMetadata);
 
