@@ -102,7 +102,7 @@
     - This method assures the data is replicated in the all the clusters but there is a performance impact to this option.
 
 - **retries** - No of times that you would like to retry.
-**delivery.timeout.ms** -
+**delivery.timeout.ms** - The time to report the failure or successful after the send call returns.  
 - **retry.backoff.ms**  - wait for the retry before every attempt.
 
 #### Ordering Guarantees
@@ -120,3 +120,46 @@
 - Write CustomPartitioner
 - Write CustomSerializer
 - Compression of messages
+
+## Kafka Consumer
+- The consumer is used in general to read the messages from the Kafka topic.
+- The simple KafkaConsumer example is given below.
+
+### Consumer APIs
+- subscribe():
+  - The subscribe api is used to subscribe to a list of topics.
+  - There are no limits on how many topics that a particular consumer can subscribe to.
+
+```
+    Map<String,String> propsMap = new HashMap<>();
+    propsMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092,localhost:9093");
+    propsMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+    propsMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+    KafkaConsumer consumer = new KafkaConsumer(propsMap);
+    consumer.subscribe(Arrays.asList("test-topic"));
+```  
+
+- unSubscribe()
+  - The **unSubscribe** method in consumer is mainly used to unsubscribe the consumer from the broker.
+- assign()
+  - The **assign** method in consumer is mainly used to read a message from a specific Partition.
+
+```
+  public  void assign(){
+      TopicPartition topicPartition  = new TopicPartition(TOPIC, 1);
+      KafkaConsumer assignConsumer = new KafkaConsumer(propsMap());
+      assignConsumer.assign(Arrays.asList(topicPartition));
+
+  }
+```
+
+### Consumer Partition Management
+
+- The consumer partition management is completely managed to you by the Kafka Broker itself.
+- The consumer will poll and look for new messages from the subscribed topics.
+**subscribe**:  
+  - The benefit of using subscribe method is that the partition management is entirely managed for you.
+  - Any change to the **kafka** topic is notified to the consumer by the broker.
+  - Consumer maintains the **subscriptions** in an internal object called subscription state.
+  - This automatic subscription management is available only in subscribe() method.
+- The Consumer api has something called **Subscription** state which the maintaines the state of the
