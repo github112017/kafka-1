@@ -156,7 +156,7 @@
 ### Consumer Partition Management
 
 - The consumer partition management is completely managed to you by the Kafka Broker itself.
-- The consumer will poll and look for new messages from the subscribed topics.
+- The consumer will poll and look for new messages from the subscribed topics.  
 **subscribe**:  
   - The benefit of using subscribe method is that the partition management is entirely managed for you.
   - Any change to the **kafka** topic is notified to the consumer by the broker.
