@@ -163,3 +163,26 @@
   - Consumer maintains the **subscriptions** in an internal object called subscription state.
   - This automatic subscription management is available only in subscribe() method.
 - The Consumer api has something called **Subscription** state which the maintaines the state of the
+
+
+### The Poll Loop
+
+- The **poll** loop is really key because this is the one which kicks off everything and connects to the broker and polls the records and retrieves the records from the broker.
+- Below are the different objects that are involved in the Kafka Consumer
+  - **SubscriptionState** -> Plays as a source of truth for the information about the Topic and Partitions the Kafka consumer instance subscribes or assigned to.
+  - **Fetcher** -> This plays an important role in communication between the consumer and the broker. This initiates the connection between the consumer and broker through the **Consumer Network Client**. The fetcher gets the information about the topic and paritions to retrieve the record from the **subscriptionstate**.
+  - **Consumer Network Client:**
+    - Consumer sends heartbeats through this as a way of letting the broker know which consumer is alive and connected.
+    - Additionally metadata information from the broker is received.
+  - **Metadata** -> The metadata object is instantiated in the consumer using the information received from the network client. This gets upto date with every time the **poll** method is run. This metadata is used by the **ConsumerCoordinator**
+  - **ConsumerCoordinator** -> This takes care of assigning automatic and  dynamic partition assignment and updating the **subscriptionstate** object and commiting the offsets.               
+
+- The **poll** method takes in a time value which is a timeout setting. The time the **Consumer Network Client** will poll the broker for new
+messages before returning.
+
+```
+assignConsumer.poll(Duration.ofMillis(100))
+```
+
+  - After the **poll()** method is returned then there are a batch of records available in an in-memory buffer where they are parsed, deserialized and grouped as ConsumerRecord by topic and parition.
+  - Once the fetcher finishes the process then the objects are returned for processing in the consumer.
