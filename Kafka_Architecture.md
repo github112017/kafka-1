@@ -205,4 +205,6 @@ auto.offset.reset=latest
 
 - Kafka stores all the consumer offsets in a topic named **__consumer_offsets**.
   - It has 50 partitions.
-  - **ConsumerCoorinator** takes care of producing the data to the **__consumer_offsets**.  
+  - **ConsumerCoorinator** takes care of producing the data to the **__consumer_offsets**.
+
+### Manual Consumer Offset Management
