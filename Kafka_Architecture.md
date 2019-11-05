@@ -167,7 +167,7 @@
 
 ### The Poll Loop
 
-- The **poll** loop is really key because this is the one which kicks off everything and connects to the broker and polls the records and retrieves the records from the broker.
+- The **poll** loop is really key because this is the one which kicks off everything and connects to the broker and polls the records and retrieves the records from the broker. This is a single threaded process.
 - Below are the different objects that are involved in the Kafka Consumer
   - **SubscriptionState** -> Plays as a source of truth for the information about the Topic and Partitions the Kafka consumer instance subscribes or assigned to.
   - **Fetcher** -> This plays an important role in communication between the consumer and the broker. This initiates the connection between the consumer and broker through the **Consumer Network Client**. The fetcher gets the information about the topic and paritions to retrieve the record from the **subscriptionstate**.
@@ -184,5 +184,25 @@ messages before returning.
 assignConsumer.poll(Duration.ofMillis(100))
 ```
 
-  - After the **poll()** method is returned then there are a batch of records available in an in-memory buffer where they are parsed, deserialized and grouped as ConsumerRecord by topic and parition.
-  - Once the fetcher finishes the process then the objects are returned for processing in the consumer.
+  - After the **poll()** method is returned then there are a batch of records available in an in-memory buffer in fetcher where they are parsed, deserialized and grouped as ConsumerRecords by topic and parition.
+  - Once the above process is completed then the objects are returned for processing in the consumer.
+
+### Consumer Offset
+- last-commited-offset:
+  - Represents the bookamrk of the records that the consumer had read already.
+- By default the consumer offsets are managed automatically by Kafka Consumer based on the below properties.
+
+```
+enable.auto.commit = true
+auto.commit.interval=5000(ms)
+auto.offset.reset=latest
+```
+- What are the problems with auto commiting offsets ?
+  - A record might be committed before the actual processing of the record is completed.
+  -
+
+#### Storing the Offset
+
+- Kafka stores all the consumer offsets in a topic named **__consumer_offsets**.
+  - It has 50 partitions.
+  - **ConsumerCoorinator** takes care of producing the data to the **__consumer_offsets**.  
