@@ -175,7 +175,8 @@
     - Consumer sends heartbeats through this as a way of letting the broker know which consumer is alive and connected.
     - Additionally metadata information from the broker is received.
   - **Metadata** -> The metadata object is instantiated in the consumer using the information received from the network client. This gets upto date with every time the **poll** method is run. This metadata is used by the **ConsumerCoordinator**
-  - **ConsumerCoordinator** -> This takes care of assigning automatic and  dynamic partition assignment and updating the **subscriptionstate** object and commiting the offsets.               
+  - **ConsumerCoordinator** -> This takes care of assigning automatic and  dynamic partition assignment and updating the **subscriptionstate** object and commiting the offsets.         
+          - This also updates the **SubscriptionState** with the commited offset value so that the **Fetcher** will know what is read already and what is not read. Based on this value the fetcher will poll the records from the kafka topic.
 
 - The **poll** method takes in a time value which is a timeout setting. The time the **Consumer Network Client** will poll the broker for new
 messages before returning.
@@ -208,3 +209,27 @@ auto.offset.reset=latest
   - **ConsumerCoorinator** takes care of producing the data to the **__consumer_offsets**.
 
 ### Manual Consumer Offset Management
+
+#### CommitSync()
+
+- This is one of the way of manually committing the offset.
+- By using commitSync you can get more control of processing the records and manually **commiting** the offset when the records are successfully processed.
+- By manually controlling the offset you will have an impact in the **throughput** and **performance** over **consistency**.
+- This can add a latency to the overall polling process.
+
+#### CommitASync()
+
+- This is non blocking and non deterministic.
+- No retries are allowed in **commitAsync**
+- The **commitAsync** has a callback through which you can implement the retry logic.
+- With this option you wont be loosing anything from the performance and throughput perspective.
+- This is not a recommended option at all.
+
+- Both the **commitSync()** and **commitAsync()** invokes the Consumer-Coordinator which commits the offset to the **consumer_offsets** topic.
+
+
+### When to Manage your own offsets
+
+- When consistency is really mandatory for your application and you want to take control of processing the records one by one.
+- Atomicity
+  - Exactly once semantics.
