@@ -170,6 +170,9 @@
 - The **poll** loop is really key because this is the one which kicks off everything and connects to the broker and polls the records and retrieves the records from the broker. This is a single threaded process.
 - Below are the different objects that are involved in the Kafka Consumer
   - **SubscriptionState** -> Plays as a source of truth for the information about the Topic and Partitions the Kafka consumer instance subscribes or assigned to.
+    - This also maintains the last committed offset of a given partition.
+    - This helps the new consumer to read from the last committed offset.
+
   - **Fetcher** -> This plays an important role in communication between the consumer and the broker. This initiates the connection between the consumer and broker through the **Consumer Network Client**. The fetcher gets the information about the topic and paritions to retrieve the record from the **subscriptionstate**.
   - **Consumer Network Client:**
     - Consumer sends heartbeats through this as a way of letting the broker know which consumer is alive and connected.
@@ -233,3 +236,58 @@ auto.offset.reset=latest
 - When consistency is really mandatory for your application and you want to take control of processing the records one by one.
 - Atomicity
   - Exactly once semantics.
+
+### Consumer-Groups
+
+- Consumer instances working together as a team forms consumer group.
+- It shares the message consumption and processing the load
+  - Parallelism and throughput
+  - Perfomance of processing the message are improved.
+
+### Consumer Group Co-Ordinator
+- Behind the scenes a broker from the cluster is designated as a **Group-Coordinator**.
+  - It maintains and monitor the consumer group membership.
+- The group-coordinator also interacts with the zookeeper and consumer coordinator for any new changes to the topic that it needs to act on.
+- From the time the consumer group is formed, each consumer in the consumer group sends heartbeats in an interval
+
+```
+heartbeat.interval.ms=3000 // heartbeats are sent every 3seconds
+session.timeout.ms = 30000 // the group-coordinator will wait until this time to until the heart beat is received from the consumer. If the heart beat is not received then it will mark the consumer as dead.
+```  
+
+#### Why/When HeartBeats are sent ?
+- Consumers maintain the membership in a consumer group and ownership of the partitions by periodically sending the heartbeats.
+- Heartbeats are sent when the consumer polls or when the consumer commits the offset for older versions before (0.10.1).
+  - If the heart beats are not sent then the consumer is not considered dead and the group co-ordinator triggers a rebalance.
+
+
+#### Consumer Rebalance
+- Moving partition ownership from one consumer to another is called a **Rebalance**.
+- If the consumer is dead then the Group Co-Ordinator takes care of rebalancing the consumers by assigning the partitions to the available consumer instance.
+  - This is where offset management is really critical. If the offsets are not managed properly then there is a possibility it might re-process the records.
+- If any new partition is added then during that scenario the consumer rebalance will happen.
+- During Rebalance the consmer wont be able to process any records. Once the rebalance is successful it will start to process the records from the kafka topic.
+
+#### Adding a new Consumer
+- When an extisting parition is assigned to a new consumer because of a rebalance. In this case the consumer has no clue about where to read the data from. The **SubscriptionState** object has the information about the last committed offset and the newly joined consumer leverage this to read the data from the parition.
+
+#### Role of Group CoOrdinator
+
+- Guarantees 1:1 consumer to partition ratio.
+- Initiates the Rebalancing Protocol
+  - Any topic Changes(Adding or Removing Partitions)
+  - Consumer Failure
+
+### Consumer Configuration
+
+- **fetch.min.bytes**  
+  - This makes
+
+- Consumer Position Control
+  - seek()
+  - seekToBeginning()
+  - seekToEnd()
+- Flow control
+  - pause()
+  - resume()
+- Rebalance Listeners  
