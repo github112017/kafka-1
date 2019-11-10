@@ -167,12 +167,14 @@
 
 ### The Poll Loop
 
-- The **poll** loop is really key because this is the one which kicks off everything and connects to the broker and polls the records and retrieves the records from the broker. This is a single threaded process.
+- The **poll** loop is really key because this is the one which kicks off everything and connects to the broker and polls the records and retrieves the records from the broker.
+- The poll loop handles all details of coordination, partition rebalances, heartbeats, and data fetching,
+- This is a single threaded process.
+- The **poll()** returns a list of records. Each record contains the topic and partition the record came from, the offset of the record within the partition, and of course the key and the value of the record. Typically we want to iterate over the list and process the records individually.
 - Below are the different objects that are involved in the Kafka Consumer
   - **SubscriptionState** -> Plays as a source of truth for the information about the Topic and Partitions the Kafka consumer instance subscribes or assigned to.
     - This also maintains the last committed offset of a given partition.
     - This helps the new consumer to read from the last committed offset.
-
   - **Fetcher** -> This plays an important role in communication between the consumer and the broker. This initiates the connection between the consumer and broker through the **Consumer Network Client**. The fetcher gets the information about the topic and paritions to retrieve the record from the **subscriptionstate**.
   - **Consumer Network Client:**
     - Consumer sends heartbeats through this as a way of letting the broker know which consumer is alive and connected.
