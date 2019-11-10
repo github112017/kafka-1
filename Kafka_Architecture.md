@@ -295,8 +295,12 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
   - Default value is 1 MB.
 - **Session.timeout.ms**
   - The amount of time the consumer can go out of contact with the broker.
-  - The **heartbeat.interval.ms**
--   
+  - The **heartbeat.interval.ms** is the time the heartbeats are sent to the broker from the consumer
+- **AUTO.OFFSET.RESET**
+  - **latest** is the default
+    - Read the new records from the partition
+  - **earliest** - read from the beginning of the partition. 
+
 
 - Consumer Position Control
   - seek()

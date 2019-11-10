@@ -17,8 +17,13 @@
         <appender-ref ref="CONSOLE"/>
     </root>
 
-    <root level="trace">
+    <root level="error">
         <appender-ref ref="CONSOLE"/>
     </root>
+
+    <!--for kafka heartbeat logs-->
+  <!--  <root level="trace">
+        <appender-ref ref="CONSOLE"/>
+    </root>-->
 
 </configuration>
