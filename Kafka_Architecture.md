@@ -283,7 +283,18 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
 ### Consumer Configuration
 
 - **fetch.min.bytes**  
-  - This makes
+  - This ensures that the minimum number of bytes are returned to the consumer from the broker.
+  - This makes sure the calls between the broker and the consumer is not very frequent.
+
+- **fetch.max.wait.ms**
+  - This makes sure the maximum time the the fetch request will wait incase of no data.
+  - Default value is **500ms**
+
+- **Max.parition.fetch.bytes**
+  - Default value is 1 MB.
+- **Session.timeout.ms**
+  - The amount of time the consumer can go out of contact with the broker.
+  - The **heartbeat.interval.ms**
 
 - Consumer Position Control
   - seek()
