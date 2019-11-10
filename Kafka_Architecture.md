@@ -261,6 +261,7 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
 - Consumers maintain the membership in a consumer group and ownership of the partitions by periodically sending the heartbeats.
 - Heartbeats are sent when the consumer polls or when the consumer commits the offset for older versions before (0.10.1).
   - If the heart beats are not sent then the consumer is not considered dead and the group co-ordinator triggers a rebalance.
+  - HeartBeat Configuration is available in the folloing [link](https://github.com/code-with-dilip/kafka/blob/master/learn-kafka/README.md)
 
 
 #### Consumer Rebalance
@@ -295,6 +296,7 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
 - **Session.timeout.ms**
   - The amount of time the consumer can go out of contact with the broker.
   - The **heartbeat.interval.ms**
+-   
 
 - Consumer Position Control
   - seek()
