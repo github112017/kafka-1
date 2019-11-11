@@ -193,6 +193,7 @@ assignConsumer.poll(Duration.ofMillis(100))
   - After the **poll()** method is returned then there are a batch of records available in an in-memory buffer in fetcher where they are parsed, deserialized and grouped as ConsumerRecords by topic and parition.
   - Once the above process is completed then the objects are returned for processing in the consumer.
 
+
 ### Consumer Offset
 - last-commited-offset:
   - Represents the bookamrk of the records that the consumer had read already.
@@ -205,7 +206,11 @@ auto.offset.reset=latest
 ```
 - What are the problems with auto commiting offsets ?
   - A record might be committed before the actual processing of the record is completed.
-  -
+  - With autocommit enabled, a call to poll will always commit the last offset returned by the previous poll
+
+### Commit and Offset
+  - One of Kafka’s unique characteristics is that it does not track acknowledgments from consumers the way many JMS queues do. Instead, it allows consumers to use Kafka to track their position (offset) in each partition.  
+  -  All the Consumer Offsets are persisted in the a special topic named **__consumer_offsets**.
 
 #### Storing the Offset
 
@@ -221,17 +226,74 @@ auto.offset.reset=latest
 - By using commitSync you can get more control of processing the records and manually **commiting** the offset when the records are successfully processed.
 - By manually controlling the offset you will have an impact in the **throughput** and **performance** over **consistency**.
 - This can add a latency to the overall polling process.
+  - Basically the consumer will be blocked until the response is received from the broker.
+  - commitSync() retries committing as long as there is no error that can’t be recovered
+
+```
+public void subscribe(){
+        Map<String,String> subscribeProps = propsMap();
+        subscribeProps.put(ConsumerConfig.GROUP_ID_CONFIG, "subscribeconsumer");
+        KafkaConsumer subscribeConsumer = new KafkaConsumer(subscribeProps);
+        subscribeConsumer.subscribe(Arrays.asList(TOPIC));
+        try{
+            while(true){
+                ConsumerRecords<String, String> records =  subscribeConsumer.poll(Duration.ofMillis(100));
+                records.forEach((record) -> {
+                    logger.info("Subscribe Consumer record is : "+ record);
+                });
+                subscribeConsumer.commitSync();
+            }
+
+        }catch (CommitFailedException e){
+            logger.info("CommitFailedException Occurred {}", e);
+        }catch (Exception e){
+            logger.info("Exception Occurred {}", e);
+        }
+        finally {
+            subscribeConsumer.close();
+        }
+    }
+```
+
 
 #### CommitASync()
 
 - This is non blocking and non deterministic.
-- No retries are allowed in **commitAsync**
+- No retries are allowed in **commitAsync()**
 - The **commitAsync** has a callback through which you can implement the retry logic.
 - With this option you wont be loosing anything from the performance and throughput perspective.
 - This is not a recommended option at all.
 
 - Both the **commitSync()** and **commitAsync()** invokes the Consumer-Coordinator which commits the offset to the **consumer_offsets** topic.
 
+
+#### Combining Synchronous and Asynchronous Commits
+
+- Combining both is one of the better option.
+- Sample code below:
+
+```
+try {
+    while (true) {
+        ConsumerRecords<String, String> records = consumer.poll(100);
+        for (ConsumerRecord<String, String> record : records) {
+            System.out.printf("topic = %s, partition = %s, offset = %d,
+                customer = %s, country = %s\n",
+                record.topic(), record.partition(),
+                record.offset(), record.key(), record.value());
+        }
+        consumer.commitAsync(); 1
+    }
+} catch (Exception e) {
+    log.error("Unexpected error", e);
+} finally {
+    try {
+        consumer.commitSync(); 2
+    } finally {
+        consumer.close();
+    }
+}
+```
 
 ### When to Manage your own offsets
 
@@ -313,6 +375,9 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
 - **MAX.POLL.RECORDS**
   - Maximum number of records that a single poll() call will return.  
 
+### Rebalance Listeners
+- This is used when you want to implement some custom logic when the consumer leaves a consumer group or a consumer gets added to the consumer group.
+- You can implement this functionality by implementing the **ConsumerRebalanceListener** interface.
 
 - Consumer Position Control
   - seek()
