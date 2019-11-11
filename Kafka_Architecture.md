@@ -299,7 +299,19 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
 - **AUTO.OFFSET.RESET**
   - **latest** is the default
     - Read the new records from the partition
-  - **earliest** - read from the beginning of the partition. 
+  - **earliest** - read from the beginning of the partition.
+- **enable.auto.commit**
+    - This parameter controls whether the offsets are committed automatically.
+    - **auto.commit.interval.ms** -> This parameter controls how often offsets are committed.
+- **PARTITION.ASSIGNMENT.STRATEGY**
+  - A class called **PartitionAssignor** takes care of assigning the partitions.
+  - There are two strategies available - **Range** and **RoundRobin**
+    - Range -> Default Strategy
+      - Subset of partitions are assigned.
+    - RoundRobin
+      - It takes a round robin approach to assign the partitions to the consumer.
+- **MAX.POLL.RECORDS**
+  - Maximum number of records that a single poll() call will return.  
 
 
 - Consumer Position Control
