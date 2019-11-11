@@ -11,11 +11,11 @@ public class RebalanceHandler implements ConsumerRebalanceListener {
     private static final Logger logger = LoggerFactory.getLogger(RebalanceHandler.class);
     @Override
     public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
-        logger.info("Inside Paritions Revoked");
+        logger.info("Inside Partitions Revoked");
     }
 
     @Override
     public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-        logger.info("Inside Paritions Assigned");
+        logger.info("Inside Partitions Assigned : " + partitions);
     }
 }

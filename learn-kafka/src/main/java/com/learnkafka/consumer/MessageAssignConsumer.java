@@ -4,6 +4,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -15,11 +16,14 @@ import static com.learnkafka.consumer.KafkaConsumerProps.propsMap;
 public class MessageAssignConsumer {
 
     public void assign(){
-        TopicPartition topicPartition  = new TopicPartition(TOPIC, 1);
-        Map<String,String> assignProps = propsMap();
-        assignProps.put(ConsumerConfig.GROUP_ID_CONFIG, "assignconsumer");
-        KafkaConsumer assignConsumer = new KafkaConsumer(assignProps);
-        assignConsumer.assign(Arrays.asList(topicPartition));
+        TopicPartition topicPartition  = new TopicPartition(TOPIC, 0);
+        Map<String,String> subscribeProps = propsMap();
+        subscribeProps.put(ConsumerConfig.GROUP_ID_CONFIG, "assignconsumer");
+        subscribeProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+        //subscribeProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        KafkaConsumer assignConsumer = new KafkaConsumer(subscribeProps);
+       // assignConsumer.assign(Arrays.asList(topicPartition));
+        assignConsumer.seekToBeginning(Arrays.asList(topicPartition));
         try{
             while(true){
                 ConsumerRecords<String, String> records =  assignConsumer.poll(Duration.ofMillis(100));
