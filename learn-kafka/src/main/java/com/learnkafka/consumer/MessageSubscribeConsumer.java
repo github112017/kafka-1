@@ -21,10 +21,10 @@ public class MessageSubscribeConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageSubscribeConsumer.class);
 
-
     public void subscribe(){
         Map<String,String> subscribeProps = propsMap();
         subscribeProps.put(ConsumerConfig.GROUP_ID_CONFIG, "subscribeconsumer");
+        subscribeProps.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "10000");
         KafkaConsumer subscribeConsumer = new KafkaConsumer(subscribeProps);
         subscribeConsumer.subscribe(Arrays.asList(TOPIC), new RebalanceHandler());
         try{
@@ -46,12 +46,7 @@ public class MessageSubscribeConsumer {
         }
     }
 
-
     public static void main(String[] args) {
-
-
         new MessageSubscribeConsumer().subscribe();
-
-
     }
 }

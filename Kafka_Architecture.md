@@ -352,12 +352,16 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
 - **fetch.max.wait.ms**
   - This makes sure the maximum time the the fetch request will wait incase of no data.
   - Default value is **500ms**
-
+- **heartbeat.interval.ms**
+  - The interval in which the heartbeats are sent.
 - **Max.parition.fetch.bytes**
   - Default value is 1 MB.
 - **Session.timeout.ms**
   - The amount of time the consumer can go out of contact with the broker.
   - The **heartbeat.interval.ms** is the time the heartbeats are sent to the broker from the consumer
+- **max.poll.interval.ms**  
+  - The maximum time the consumer can go without invoking the **poll()** method.
+  - The default value is 300000 ms(5 minutes).
 - **AUTO.OFFSET.RESET**
   - **latest** is the default
     - Read the new records from the partition
@@ -375,9 +379,12 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
 - **MAX.POLL.RECORDS**
   - Maximum number of records that a single poll() call will return.  
 
+
 ### Rebalance Listeners
 - This is used when you want to implement some custom logic when the consumer leaves a consumer group or a consumer gets added to the consumer group.
 - You can implement this functionality by implementing the **ConsumerRebalanceListener** interface.
+
+- Check the code in the **RebalanceHandler** of the learn-java codebase.
 
 - Consumer Position Control
   - seek()
