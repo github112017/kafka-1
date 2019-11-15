@@ -1,2 +1,6 @@
 rootProject.name = 'learn-kafka'
 
+include 'kafka-avro'
+include 'kafka-custom-serializer-deserializer'
+include 'kafka-producer-consumer'
+
