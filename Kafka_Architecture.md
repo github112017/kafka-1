@@ -115,6 +115,9 @@
 - This is not just for the network transport. This helps to achieve storage and compression.
 - The whole lifecycle of the message starts with the producer.
 
+### Custom Serializers
+- 
+
 #### Things to Do (Kafka Producer)
 
 - Write CustomPartitioner
