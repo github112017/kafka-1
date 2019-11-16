@@ -15,3 +15,4 @@
 ## Avro Files
 
 -   **Avro** File is a concept where the entire schema and the data is together. 
+
