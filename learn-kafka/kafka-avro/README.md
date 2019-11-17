@@ -14,5 +14,15 @@
 
 ## Avro Files
 
--   **Avro** File is a concept where the entire schema and the data is together. 
+-   **Avro** File is a concept where the entire schema and the data is present as part of the file.
+    -   But this approach has issues because when you expect the entire schema to be present as part of the record usually results in double the size of the record.
+
+## Schema Registry
+
+ -   **Schema Registry** is one of the established pattern where you can store the **Schema**
+-   This is not part of **Kafka**, but the Confluent platform comes with it.
+-   The idea is to store all the schema that are used to write data to kafka in the registry.
+-   Then we simply provide the identifier of the schema as part of the record as we produce the data in to Kafka.
+    -   The Consumers then can use the identifier to read the schema from the registry and de-serialize the data.          
+           
 

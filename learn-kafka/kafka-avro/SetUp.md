@@ -18,7 +18,7 @@
 
 **my-first-topic:**
 ```youtrack
-./kafka-topics.sh --create --topic test-topic-avro -zookeeper localhost:2181 --replication-factor 1 --partitions 4
+kafka-topics --create --topic test-topic-avro -zookeeper localhost:2181 --replication-factor 1 --partitions 4
 ```
 
 ## How to instantiate a Console Producer?
