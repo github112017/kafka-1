@@ -1,0 +1,31 @@
+/*
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.imflog:kafka-schema-registry-gradle-plugin:0.7.0"
+    }
+}
+
+apply plugin: "com.github.imflog.kafka-schema-registry-gradle-plugin"
+
+
+*/
+
+/*plugins {
+    id "com.github.imflog.kafka-schema-registry-gradle-plugin" version "0.7.0"
+}*/
+
+repositories {
+    maven {
+        url "https://packages.confluent.io/maven/"
+    }
+}
+
+dependencies {
+    compile 'io.confluent:kafka-avro-serializer:3.3.1'
+    compile group: 'io.confluent', name: 'kafka-schema-registry', version: '5.0.0'
+}
