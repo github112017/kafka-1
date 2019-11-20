@@ -68,6 +68,7 @@
   - direct  : Partition number is mentioned as part of the **send** call itself.
   - roundrobin  : If no key or partition is mentioned, then the **round-robin** will be used.
   - key-mod hash  : Applies murmur hash of the key and applies the modulus function of the number of partitions.
+    - Kafka will hash the key and use the result to map the record to a partition.
     ```
     murmurhash/3(no of paritions)
     ```
@@ -116,13 +117,17 @@
 - The whole lifecycle of the message starts with the producer.
 
 ### Custom Serializers
-- 
+-
 
 #### Things to Do (Kafka Producer)
 
 - Write CustomPartitioner
 - Write CustomSerializer
-- Compression of messages
+
+### Kafka Producer and Partitions
+
+- All messages with the same key will go to the same partition.
+-
 
 ## Kafka Consumer
 - The consumer is used in general to read the messages from the Kafka topic.
@@ -397,3 +402,141 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
   - pause()
   - resume()
 - Rebalance Listeners  
+
+### Message Compression of messages
+
+
+## Kafka Internals
+
+### Cluster Membership
+- Kafka uses **Zookeeper** for maintaining cluster membership.
+- Each broker has a unique id.
+- Everytime the broker starts it registers itself using this id.
+- It creates a **znode(ephemeral)** for each broker(using the **broker id**) thats connected with zookeeper. The znode is alive as long as the broker is active.
+
+### The Controller
+
+- The controller is one of the broker. In addition to the usual broker functionality it takes care of assigning the partition leaders.
+  - There can be only one **controller** at any given time.
+- The first broker that starts in the cluster becomes the controller by creating an **ephemeral node** in ZooKeeper called **/controller**.
+- The brokers create a **Zookeeper watch** on the controller node so they get notified of changes to this node.
+- When the controller goes down then the **epheermal node** goes down, the other brokers get notified and the other brokers will try to create the controller themselves and one will be successful and the others will create a **Zookeeper watch**.
+
+#### Re-Election of Leader(One of the broker goes down)
+- When the controller notices a broker left the cluster (by watching the **Zookeepers Path**), it knows that it needs to elect a new leader for the existing partitions and let the other brokers know about the new leader and the followers need to follow the new leader.
+- The new leader knows that they need to start serving the producer and consumer requests for that particular parition.
+
+#### Controller Summary
+- Kafka uses Zookeeper’s ephemeral node feature to elect a controller and to notify the controller when nodes join and leave the cluster.
+- The controller is responsible for electing leaders among the partitions and replicas whenever it notices nodes join and leave the cluster
+
+### Replication
+- Replication is at the heart of Kafka’s architecture
+- Kafka is often described as **a distributed, partitioned, replicated commit log service**.
+- Kafka guarantees availability and durability when individual nodes inevitably fail.
+- Kafka is organized by TOPICs
+  - Each topic is partitioned, and each partition can have multiple replicas.
+- There are two types of replica:
+  - **leader replica:**
+    - This holds the replica of the data sent to that partition by the producer and consumer.
+    - All the consumer and producer requests for that partition goes through the Leader.
+    - This replica makes sure all the follower replicas are up to date. The leader marks the replica as **out of sync** if it had not received any request for 10 seconds.
+  - **follower replica:**
+    - This holds the replication of data from the leader. These don't serve the client requests directly.
+    - Follower replica should stay upto date with the leader. In the event of a crash of the leader one of the follower becomes the leader.
+    - Out Of Sync Replica:
+      - A replica is considered to be out of sync replica if it had not requested for data for about 10 seconds.
+      - An Out of Sync replica can never be leader.
+    - In Sync Replica
+          - A follower replica which is upto date with the leader is called in sync replica.
+
+### Request Processing
+- Kafka does the below processing:
+  - process requests sent to the partition leaders from clients,
+  - partition replicas,
+  - controller.
+- Kafka has a binary protocol (over TCP) that specifies the format of the requests and how brokers respond to them—both when the request is processed successfully or when the broker encounters errors while processing the request.
+- All requests have a standard header
+  - Request Type
+  - Request Version
+  - Correlation ID
+  - Client Id
+  - Example message is below.
+  ```
+  Sending PRODUCE {acks=1,timeout=30000,partitionSizes=[test-topic-0=71]} with correlation id 3 to node 0
+  ```
+- Both produce requests and fetch requests have to be sent to the leader replica of a partition.
+  - The client performs a metadata request type which has information about:
+    - Leader replica
+    - follower replica and
+    - Partitions in the topic.
+-   MetaData request can be sent to any brokers because all the brokers have information about the each other and its cached.
+- Typically its cached in the client end also. It periodically refreshes the metadata and using the **metadata.max.age.ms** settings.
+
+#### Produce Requests
+- When the leader of the partition receives the request, it runs through certain validations:
+  - Does the client have the priviliges to make the request?
+  - Is the number of acks specified in the request is valid?
+  - If acks is set to **all** then do we have enough **in-sync** replicas.
+- Once the above are validated then it writes the data in to the disk.
+- Once the data is written to the leader replica then it checks the **acks** config and respond accordingly.
+  - If **acks** is set as 0 or 1 then the response will be sent immediately.
+  - If **acks** is set as **all** then this will wait until all the follower replicas have replicated the data. The request will be stored in a memory called **purgatory** until the leader observes the followers have replicated it.
+
+#### Fetch Requests
+- Fetch requests work similar as the **producer** requests. The calls will go to the leader of the parition.
+- How much of data and from which offset the data is needed is represented in the request itself.
+- It runs a set of validations once the request is received:
+    - Does the client have the necessary credentials to perform the request ?
+    - Is the requested offset present in the parition?.
+-   Kafka uses the **Zero-Copy** method to send the messages to the clients.
+  - This means kafka reads the message directly to the network channel. It does not buffer anything.
+- Clients only read the messages that are written to the **insync** replicas.
+  - This is to make sure that the client won't see an inconsistent behavior if the leader crashes.
+
+#### Other Requests
+- There are 20 different requests that are available in kafka. We just explored a few :
+  - FetchRequest,
+  - Produce Request and
+  - MetaDataRequest  
+### Physical Storage
+
+- The basic physical unit of storage is the **replica**   
+- The **log.dirs** holds the directory where the partition replica will be written.
+
+#### Parition Allocation
+- The paritions are assigned to the broker in an intelligent way so that the replicas are present in the other brokers.
+- If racks are involved then the replica will be present in the different different rack al-together.
+
+#### File Management
+- Kafka is not going to retain the data forever. It retains the data based on the configuration period.
+- All the messages are written to a log file and the directory information is present in **log.dirs** directory.
+- The file is normally split in to **segments** so that it is easy to purge the data when data timeframe is greater than the retention time.
+  - By Default, the segment size is 1 GB or a week of data.
+- The current segment that the partition writes to is the **active** segment.
+
+#### File Format
+
+- Check the book for this one.
+
+#### Indexes
+- Kafka maintaines an index for each partition,
+- The index maps to segment file and then map to the position inside the file.
+- With the help of index its really easy to purge the data
+
+### Compaction
+- Kafka will store messages for a set amount of time and purge messages older than the retention period.
+- Kafka supports retention time as **compact**
+  - This means that stores the most recent value for a given key in the topic.
+- Key cannot be null for topics that are compacted.
+
+#### How Compaction is performed:
+- When Kafka is started and the **log.cleaner.enabled** flag as true.
+  - This starts two sets of threads:
+    - Compaction Manager Thread
+    - Number of Compaction threads
+  - These are responsible for performing compaction related tasks.
+- To Compact a partition, the cleaner thread reads the dirtiest part of the partition and loads the key in to the map and the offset of the previous message that had the same key.
+- Once the map is built, the cleaner thread starts reading the clean section of the partition and checks the map has the same key.
+  -  If the same key exists the it replaced the one with the offset fm the latest map.
+- Messages are eligble for compaction only on inactive segments.    
