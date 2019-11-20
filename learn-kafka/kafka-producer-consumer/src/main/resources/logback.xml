@@ -18,8 +18,8 @@
     </root>-->
 
     <!--for kafka heartbeat logs-->
-  <!--  <root level="trace">
+    <root level="trace">
         <appender-ref ref="CONSOLE"/>
-    </root>-->
+    </root>
 
 </configuration>
