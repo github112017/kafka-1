@@ -540,3 +540,27 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
 - Once the map is built, the cleaner thread starts reading the clean section of the partition and checks the map has the same key.
   -  If the same key exists the it replaced the one with the offset fm the latest map.
 - Messages are eligble for compaction only on inactive segments.    
+
+## Reliable Data Delivery
+
+### Reliability Guarantees
+
+- Kafka Guarantees that the message are ordered in a partition.
+- Produced messages are considered committed when the messages are written to all of the insync replicas.
+- Consumers can only read the committed messages.
+- Messages that are committed wont be lost as long as one of the replica is alive.
+
+### Replication
+- Kafka replication mechanism is at the core of the Reliability Guarantees.
+- Having a message written in multiple places is how Kafka offers reliability.
+- Each Kafka topic has one or more partitions which holds the actual data thats produced by the application.
+- The Partition in general is replicated in multiple nodes.
+- A replica is considered in-sync if its a leader or If its a follower:
+  - If it maintains an active connection with the Zookeepers
+  - If it fetched the messages from the leader in the past 10 seconds.
+  - The replica should not have any lag.
+- A replica is considered out-of-sync:
+  - If the ZooKeeper connection is not active.
+  - If the replica node did not request for new messages in the past 10 seconds.
+  - If the replica flips between in-sync and out-of-sync frequently then its possibly the Java Garbage collection's mis-configuration.
+- An **in-sync** replica can slow down a producer/consumer since they wait for all the replicas to be in sync before the message is commited.
