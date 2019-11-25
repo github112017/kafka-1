@@ -540,3 +540,106 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
 - Once the map is built, the cleaner thread starts reading the clean section of the partition and checks the map has the same key.
   -  If the same key exists the it replaced the one with the offset fm the latest map.
 - Messages are eligble for compaction only on inactive segments.    
+
+## Reliable Data Delivery
+
+### Reliability Guarantees
+
+- Kafka Guarantees that the message are ordered in a partition.
+- Produced messages are considered committed when the messages are written to all of the insync replicas.
+- Consumers can only read the committed messages.
+- Messages that are committed wont be lost as long as one of the replica is alive.
+
+### Replication
+- Kafka replication mechanism is at the core of the Reliability Guarantees.
+- Having a message written in multiple places is how Kafka offers reliability.
+- Each Kafka topic has one or more partitions which holds the actual data thats produced by the application.
+- The Partition in general is replicated in multiple nodes.
+- A replica is considered in-sync if its a leader or If its a follower:
+  - If it maintains an active connection with the Zookeepers
+  - If it fetched the messages from the leader in the past 10 seconds.
+  - The replica should not have any lag.
+- A replica is considered out-of-sync:
+  - If the ZooKeeper connection is not active.
+  - If the replica node did not request for new messages in the past 10 seconds.
+  - If the replica flips between in-sync and out-of-sync frequently then its possibly the Java Garbage collection's mis-configuration.
+- An **in-sync** replica that is slightly behind can slow down a producer/consumer since they wait for all the replicas to be in sync before the message is committed.
+
+### Broker Configuration
+- Configurations at the broker level applies to all the topics in the cluster. But this can be overridden at the topic level also.
+- There are three configurations at the broker level to have a reliable message storage
+  - Replication Factor (Set at the broker level and topic level)
+  - Unclean Leader Election(Set only at the broker level)
+  - Minimum In-Sync Replicas (Set at the broker level and topic level)
+
+#### Replication Factor:
+
+- By having a replication factor of N, you can lose (n-1) brokers.
+  - But you need to have N number of brokers to support that.
+- By having the higher replication factor you have high availability, high reliability and fewer disasters.
+  - On the flip side to support the higher replication factor you need to have allocation of more hardware and more resources.
+    - You need to have N brokers
+    - You will have N copies of the data spread across the brokers.
+  - Replication Factor
+    - By default the replication factor is 3.
+    - Replication Factor as 1:
+      - If the broker goes down then there is no way a clients can access the data so its not highly available.
+    - Replication Factor as 2:
+      - If the one of the broker goes down then the cluster is not considered as stable then this triggers the restart of the another broker.
+
+#### Unclean Leader Election
+- By default this flag is set to true.
+  - unclean.leader.election.enable and by default it is set to true.
+- By setting this flag as **true** we are accepting the fact that an **out-of-sync** replica node can be a leader.
+  - This will result in data loss as the out of sync replica is not always upto date with the data.
+- But for systems that relies on high data consistency should set this flag as false.   
+
+#### Minimum In-Sync Replicas
+- Have this value always set as greater than 1.
+- Lets assume a scenario where there are three brokers and insync replics is set as 2.
+  - If two brokers out of the three is down then there is no way for the producer to write messages,
+    - The topic will become readonly and the consumer will just read the data whatever that's available.
+    - The **producer** wont be able to write messages in this case, the brokers will no longer accept produce requests.
+    - Instead, producers that attempt to send data will receive **NotEnoughReplicasException**
+
+### Configuring Producer in a Reliable System
+
+- Even with a clear broker configurations, It is possible to have some problem with the reliable data guarantees.
+- Producer have the **acks** config which controls response from the broker when a message is sent to the broker
+  - **acks=0** - Returns a successful responses as long as the message is sent over the network.If the kafka cluster is down, still the message is considered to be successfully sent.
+  - **acks=1** - A message is considered successfully written only when the leader replica successfully written in its node.
+  - **acks=all** - A message is considered to be successfully written when the message is replicated in all the nodes.
+- **Retry**
+    - Retrying a failed transation is one of the best way to recover from a message.
+      - **Retriable Errors:**
+        - An error is considered to be retriable If the broker is not available for a bit because of the network glitch. Retrying the failed transaction will help recover the error.
+      - **Non-Retriable Errors:**
+        - An error is considered to be non-retriable when the message has some issues with Serialization and Paritioning. Retrying this wont solve the issue at all.
+-   Read the book for remaining content on this topic.        
+### Configuring Consumers in a Reliable System  
+- Consumer Offsets play a major role when it comes to reading the messages reliably.
+- Key Consumer Properties
+  - **group-id**
+    -  If you want to scale your consumer then its recommended that you use the same group id so that the partitions will be distributed across consumer instances.
+  - **auto-offset-reset**
+    - Using this setting you can read from a latest offset or earliest offset.
+  - **enable.auto-commit**      
+    - This is one of the key attribute when it comes to reading the message from the Kafka topic reliably. This enables the consumer to read the message from where it left off.
+      - Possible values are **true** and **false**
+        - **true** - You are the letting the consumer to take care of committing the offsets automatically.
+        - **false** - As an application developer you take care of committing the offsets after you read the messages.
+  - **auto.commmit.interval.ms**
+    - This enables how often you are going to commit the offset.
+-   Read the book for remaining content on this topic.
+
+
+### Cross Cluster Data Mirroring
+
+- Copying data between clusters in Kafka are called **Mirroring**.
+  - Kafka's built in cross cluster replicator is called **MirrorMaker.**
+
+#### Use Cases of Cross-Cluster Mirroring
+
+- Regional and Central Clusters
+- Disaster Recovery
+- Cloud migrations
