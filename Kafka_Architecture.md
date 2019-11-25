@@ -631,3 +631,15 @@ session.timeout.ms = 30000 // the group-coordinator will wait until this time to
   - **auto.commmit.interval.ms**
     - This enables how often you are going to commit the offset.
 -   Read the book for remaining content on this topic.
+
+
+### Cross Cluster Data Mirroring
+
+- Copying data between clusters in Kafka are called **Mirroring**.
+  - Kafka's built in cross cluster replicator is called **MirrorMaker.**
+
+#### Use Cases of Cross-Cluster Mirroring
+
+- Regional and Central Clusters
+- Disaster Recovery
+- Cloud migrations

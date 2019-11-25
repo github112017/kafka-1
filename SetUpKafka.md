@@ -32,3 +32,15 @@
 ```youtrack
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning
 ```
+
+## List the topics in a cluster
+
+```
+./kafka-topics.sh --zookeeper localhost:2181 --list
+```
+
+## Describe a topic
+
+```
+./kafka-topics.sh --zookeeper localhost:2181 --describe
+```
