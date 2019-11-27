@@ -74,3 +74,9 @@
 ```
 ./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group console-consumer-27773
 ```
+
+## Viewing the Commit Log
+
+```
+./kafka-run-class.sh kafka.tools.DumpLogSegments --deep-iteration --files /tmp/kafka-logs/test-topic-0/00000000000000000000.log
+```
