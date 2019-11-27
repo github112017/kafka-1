@@ -14,6 +14,39 @@
 ./kafka-server-start.sh ../config/server.properties
 ```
 
+## Setting Up Multiple Kafka Brokers
+
+- The first step is to add a new **server.properties**.
+
+- We need to modify three properties to start up a multi broker set up.
+
+```
+broker.id=<unique-broker-d>
+listeners=PLAINTEXT://localhost:<unique-port>
+log.dirs=/tmp/<unique-kafka-folder>
+```
+
+- Example config will be like below.
+
+```
+broker.id=1
+listeners=PLAINTEXT://localhost:9093
+log.dirs=/tmp/kafka-logs-1
+```
+
+### Starting up the new Broker
+
+- Provide the new **server.properties** thats added.
+
+```
+./kafka-server-start.sh ../config/server-1.properties
+```
+
+```
+./kafka-server-start.sh ../config/server-2.properties
+```
+
+
 ## How to create a topic ?
 
 **my-first-topic:**
@@ -57,12 +90,19 @@
 ./kafka-topics.sh --zookeeper localhost:2181 --list
 ```
 
-## Describe a topic
+## Describe topic
+
+- The below command can be used to describe all the topics.
 
 ```
 ./kafka-topics.sh --zookeeper localhost:2181 --describe
 ```
 
+- The below command can be used to describe a specific topic.
+
+```
+./kafka-topics.sh --zookeeper localhost:2181 --topic library-events
+```
 ## How to view consumer groups
 
 ```
