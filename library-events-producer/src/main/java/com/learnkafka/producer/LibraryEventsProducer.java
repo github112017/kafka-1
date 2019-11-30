@@ -16,16 +16,13 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 @Slf4j
 public class LibraryEventsProducer {
 
-    @Value("${spring.kafka.topic}")
-    private String topic;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private KafkaTemplate<Integer, String> kafkaTemplate;
 
-    public ListenableFuture<SendResult<Integer, String>> sendMessageWithKey(LibraryEvent libraryEvent) throws JsonProcessingException {
+    public ListenableFuture<SendResult<Integer, String>> sendMessageWithKey(LibraryEvent libraryEvent, String topic) throws JsonProcessingException {
         String message = objectMapper.writeValueAsString(libraryEvent);
         Integer key = libraryEvent.getLibraryEventId();
         ListenableFuture<SendResult<Integer, String>> listenableFuture = kafkaTemplate.send(topic, key, message);

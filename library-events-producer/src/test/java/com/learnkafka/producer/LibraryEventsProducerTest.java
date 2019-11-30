@@ -4,13 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.learnkafka.domain.Book;
 import com.learnkafka.domain.LibraryEvent;
 import com.learnkafka.domain.LibraryEventStatusEnum;
-import org.apache.kafka.common.errors.TimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.core.KafkaProducerException;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -23,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext
 public class LibraryEventsProducerTest {
 
     @Autowired
@@ -31,11 +28,6 @@ public class LibraryEventsProducerTest {
 
     @Value("${spring.kafka.topic}")
     private String topic;
-
-    @BeforeEach
-    void setUp(){
-        ReflectionTestUtils.setField(libraryEventsProducer, "topic", topic);
-    }
 
     @Test
     void sendMessageWithKey() throws JsonProcessingException, InterruptedException {
@@ -54,7 +46,7 @@ public class LibraryEventsProducerTest {
                 .build();
 
         //when
-        libraryEventsProducer.sendMessageWithKey(libraryEvent);
+        libraryEventsProducer.sendMessageWithKey(libraryEvent, topic);
 
         //then
         Thread.sleep(3000);
@@ -79,7 +71,7 @@ public class LibraryEventsProducerTest {
                 .build();
 
         //when
-        ListenableFuture<SendResult<Integer, String>> listenableFuture = libraryEventsProducer.sendMessageWithKey(libraryEvent);
+        ListenableFuture<SendResult<Integer, String>> listenableFuture = libraryEventsProducer.sendMessageWithKey(libraryEvent, topic);
         SendResult<Integer, String> sendResult =  listenableFuture.get();
 
         //then
@@ -92,7 +84,6 @@ public class LibraryEventsProducerTest {
     void sendMessageWithErrorTopic() {
 
         //given
-        ReflectionTestUtils.setField(libraryEventsProducer, "topic", "sample");
 
         Book book = new Book().builder()
                 .bookId(null)
@@ -107,6 +98,6 @@ public class LibraryEventsProducerTest {
                 .build();
 
         //then
-        assertThrows(ExecutionException.class,()-> libraryEventsProducer.sendMessageWithKey(libraryEvent).get());
+        assertThrows(ExecutionException.class,()-> libraryEventsProducer.sendMessageWithKey(libraryEvent, "sample").get());
     }
 }
