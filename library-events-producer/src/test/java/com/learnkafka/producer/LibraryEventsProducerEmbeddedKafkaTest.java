@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.learnkafka.domain.Book;
 import com.learnkafka.domain.LibraryEvent;
 import com.learnkafka.domain.LibraryEventStatusEnum;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.concurrent.ExecutionException;
@@ -19,8 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Disabled
-public class LibraryEventsProducerTest {
+@EmbeddedKafka(ports = 9099, topics = {"library-events"}, brokerProperties = {"auto.create.topics.enable=false"})
+@TestPropertySource(properties = {"spring.kafka.producer.bootstrap-servers=localhost:9099"})
+public class LibraryEventsProducerEmbeddedKafkaTest {
 
     @Autowired
     LibraryEventsProducer libraryEventsProducer;
