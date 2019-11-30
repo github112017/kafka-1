@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
+import java.util.concurrent.ExecutionException;
+
 @Component
 @Slf4j
 public class LibraryEventsProducer {
@@ -22,7 +24,7 @@ public class LibraryEventsProducer {
     @Autowired
     private KafkaTemplate<Integer, String> kafkaTemplate;
 
-    public ListenableFuture<SendResult<Integer, String>> sendMessageWithKey(LibraryEvent libraryEvent, String topic) throws JsonProcessingException {
+    public ListenableFuture<SendResult<Integer, String>> sendMessage(LibraryEvent libraryEvent, String topic) throws JsonProcessingException {
         String message = objectMapper.writeValueAsString(libraryEvent);
         Integer key = libraryEvent.getLibraryEventId();
         ListenableFuture<SendResult<Integer, String>> listenableFuture = kafkaTemplate.send(topic, key, message);
@@ -38,6 +40,23 @@ public class LibraryEventsProducer {
                 }
             });
         return listenableFuture;
+    }
+
+    public SendResult<Integer, String> sendMessageSynchronous(LibraryEvent libraryEvent, String topic) throws JsonProcessingException, ExecutionException, InterruptedException {
+        String message = objectMapper.writeValueAsString(libraryEvent);
+        Integer key = libraryEvent.getLibraryEventId();
+        SendResult<Integer, String> sendResult = null;
+        try {
+            sendResult = kafkaTemplate.send(topic, key, message).get();
+        } catch (ExecutionException | InterruptedException ex) {
+            log.error("ExecutionException/InterruptedException Sending the Message {} and the exception is : {}", message , ex.getMessage());
+            throw ex;
+        }catch (Exception ex) {
+            log.error("Exception/InterruptedException Sending the Message {} and the exception is : {}", message , ex.getMessage());
+            throw ex;
+
+        }
+        return sendResult;
     }
 
     public void handleFailure(Integer key, String message, Throwable ex){
