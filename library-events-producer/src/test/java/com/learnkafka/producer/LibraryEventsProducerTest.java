@@ -50,7 +50,7 @@ public class LibraryEventsProducerTest {
 
         //then
         System.out.println("Send Reult : " + sendResult);
-        assertNotNull(sendResult.getRecordMetadata());
+        assertNotNull(sendResult.getRecordMetadata().offset());
     }
 
     @Test
@@ -74,8 +74,8 @@ public class LibraryEventsProducerTest {
         SendResult<Integer, String> sendResult =  listenableFuture.get();
 
         //then
-        System.out.println("Send Reult : " + sendResult);
-        assertNotNull(sendResult.getRecordMetadata());
+        long offset = sendResult.getRecordMetadata().offset();
+        assertNotNull(Long.valueOf(offset));
 
     }
 
@@ -120,7 +120,7 @@ public class LibraryEventsProducerTest {
         SendResult<Integer, String> sendResult = libraryEventsProducer.sendMessageSynchronous(libraryEvent, topic);
 
         //then
-        assertNotNull(sendResult.getRecordMetadata());
+        assertNotNull(sendResult.getRecordMetadata().offset());
     }
 
     @Test
@@ -143,7 +143,7 @@ public class LibraryEventsProducerTest {
         SendResult<Integer, String> sendResult = libraryEventsProducer.sendMessageSynchronous(libraryEvent, topic);
 
         //then
-        assertNotNull(sendResult.getRecordMetadata());
+        assertNotNull(sendResult.getRecordMetadata().offset());
     }
 
     @Test

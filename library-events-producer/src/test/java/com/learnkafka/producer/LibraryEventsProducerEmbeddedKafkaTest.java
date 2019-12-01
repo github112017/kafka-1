@@ -51,8 +51,7 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
         SendResult<Integer, String> sendResult =  listenableFuture.get();
 
         //then
-        System.out.println("Send Reult : " + sendResult);
-        assertNotNull(sendResult.getRecordMetadata());
+        assertNotNull(sendResult.getRecordMetadata().offset());
     }
 
     @Test
@@ -76,8 +75,7 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
         SendResult<Integer, String> sendResult =  listenableFuture.get();
 
         //then
-        System.out.println("Send Reult : " + sendResult);
-        assertNotNull(sendResult.getRecordMetadata());
+        assertNotNull(sendResult.getRecordMetadata().offset());
 
     }
 
@@ -122,7 +120,7 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
         SendResult<Integer, String> sendResult = libraryEventsProducer.sendMessageSynchronous(libraryEvent, topic);
 
         //then
-        assertNotNull(sendResult.getRecordMetadata());
+        assertNotNull(sendResult.getRecordMetadata().offset());
     }
 
     @Test
@@ -145,7 +143,7 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
         SendResult<Integer, String> sendResult = libraryEventsProducer.sendMessageSynchronous(libraryEvent, topic);
 
         //then
-        assertNotNull(sendResult.getRecordMetadata());
+        assertNotNull(sendResult.getRecordMetadata().offset());
     }
 
     @Test

@@ -17,6 +17,6 @@ spring:
       properties:
         max:
           block:
-            ms: 10000
+            ms: 3000
 
 
