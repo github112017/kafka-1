@@ -9,15 +9,12 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -28,7 +25,8 @@ public class LibraryEventsProducer {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public static String TRANSACTION_TYPE="TRANSACTION_TYPE";
+    public static String EVENT_SOURCE ="SOURCE";
+    public static String SCANNER ="SCANNER";
 
     @Autowired
     private KafkaTemplate<Integer, String> kafkaTemplate;
@@ -73,7 +71,7 @@ public class LibraryEventsProducer {
 
     private ProducerRecord<Integer, String> buildProducerRecord(Integer key, String message, String topic) {
 
-        List<Header> recordHeaders = List.of(new RecordHeader(TRANSACTION_TYPE, LibraryEventStatusEnum.ADD.toString().getBytes()));
+        List<Header> recordHeaders = List.of(new RecordHeader(EVENT_SOURCE, SCANNER.getBytes()));
 
         return new ProducerRecord<Integer, String>(topic, null, key, message, recordHeaders);
 

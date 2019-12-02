@@ -26,7 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.learnkafka.producer.LibraryEventsProducer.TRANSACTION_TYPE;
+import static com.learnkafka.producer.LibraryEventsProducer.EVENT_SOURCE;
+import static com.learnkafka.producer.LibraryEventsProducer.SCANNER;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -218,8 +219,8 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
         assertEquals(123, record.key());
         record.headers().forEach((recordHeader)->{
             System.out.println("recordHeader key : "+recordHeader.key() + " , value : "+ new String(recordHeader.value()));
-            assertEquals(recordHeader.key(), TRANSACTION_TYPE);
-            assertEquals(LibraryEventStatusEnum.ADD.toString(), new String(recordHeader.value()));
+            assertEquals(recordHeader.key(), EVENT_SOURCE);
+            assertEquals(SCANNER, new String(recordHeader.value()));
         });
 
     }
