@@ -40,7 +40,7 @@ public class LibraryEventsProducerTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -65,7 +65,7 @@ public class LibraryEventsProducerTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -92,7 +92,7 @@ public class LibraryEventsProducerTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -112,7 +112,7 @@ public class LibraryEventsProducerTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -135,7 +135,7 @@ public class LibraryEventsProducerTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -158,7 +158,7 @@ public class LibraryEventsProducerTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -177,7 +177,7 @@ public class LibraryEventsProducerTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 

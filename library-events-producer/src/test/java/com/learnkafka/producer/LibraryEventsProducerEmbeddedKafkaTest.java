@@ -70,7 +70,7 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -94,7 +94,7 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -120,7 +120,7 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -140,7 +140,7 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -163,7 +163,7 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -186,7 +186,7 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -205,7 +205,7 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
 
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
-                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .eventStatus(LibraryEventStatusEnum.ADD)
                 .book(book)
                 .build();
 
@@ -216,7 +216,11 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
         assertNotNull(sendResult.getRecordMetadata().offset());
         ConsumerRecord<Integer, String> record = KafkaTestUtils.getSingleRecord(consumer, "library-events");
         assertEquals(123, record.key());
-        //record.headers().headers(TRANSACTION_TYPE);
+        record.headers().forEach((recordHeader)->{
+            System.out.println("recordHeader key : "+recordHeader.key() + " , value : "+ new String(recordHeader.value()));
+            assertEquals(recordHeader.key(), TRANSACTION_TYPE);
+            assertEquals(LibraryEventStatusEnum.ADD.toString(), new String(recordHeader.value()));
+        });
 
     }
 }

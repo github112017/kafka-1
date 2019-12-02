@@ -3,6 +3,7 @@ package com.learnkafka.producer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learnkafka.domain.LibraryEvent;
+import com.learnkafka.domain.LibraryEventStatusEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
@@ -54,7 +55,7 @@ public class LibraryEventsProducer {
         String message = objectMapper.writeValueAsString(libraryEvent);
         Integer key = libraryEvent.getLibraryEventId();
         ProducerRecord<Integer,String> producerRecord = buildProducerRecord(key, message,topic);
-        ListenableFuture<SendResult<Integer, String>> listenableFuture = kafkaTemplate.send(topic, key, message);
+        ListenableFuture<SendResult<Integer, String>> listenableFuture = kafkaTemplate.send(producerRecord);
 
         listenableFuture.addCallback(new ListenableFutureCallback<SendResult<Integer, String>>() {
             @Override
@@ -72,7 +73,7 @@ public class LibraryEventsProducer {
 
     private ProducerRecord<Integer, String> buildProducerRecord(Integer key, String message, String topic) {
 
-        List<Header> recordHeaders = List.of(new RecordHeader(TRANSACTION_TYPE, "add".getBytes()));
+        List<Header> recordHeaders = List.of(new RecordHeader(TRANSACTION_TYPE, LibraryEventStatusEnum.ADD.toString().getBytes()));
 
         return new ProducerRecord<Integer, String>(topic, null, key, message, recordHeaders);
 
