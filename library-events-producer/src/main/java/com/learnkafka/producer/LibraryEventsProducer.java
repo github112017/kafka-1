@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learnkafka.domain.LibraryEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,6 +15,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Component
@@ -20,6 +26,8 @@ public class LibraryEventsProducer {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    public static String TRANSACTION_TYPE="TRANSACTION_TYPE";
 
     @Autowired
     private KafkaTemplate<Integer, String> kafkaTemplate;
@@ -40,6 +48,34 @@ public class LibraryEventsProducer {
                 }
             });
         return listenableFuture;
+    }
+
+    public ListenableFuture<SendResult<Integer, String>> sendMessageWithHeaders(LibraryEvent libraryEvent, String topic) throws JsonProcessingException {
+        String message = objectMapper.writeValueAsString(libraryEvent);
+        Integer key = libraryEvent.getLibraryEventId();
+        ProducerRecord<Integer,String> producerRecord = buildProducerRecord(key, message,topic);
+        ListenableFuture<SendResult<Integer, String>> listenableFuture = kafkaTemplate.send(topic, key, message);
+
+        listenableFuture.addCallback(new ListenableFutureCallback<SendResult<Integer, String>>() {
+            @Override
+            public void onFailure(Throwable ex) {
+                handleFailure(key, message, ex);
+            }
+
+            @Override
+            public void onSuccess(SendResult<Integer, String> result) {
+                log.info("Message Sent SuccessFully with Key : {} and the message is {}", key, message);
+            }
+        });
+        return listenableFuture;
+    }
+
+    private ProducerRecord<Integer, String> buildProducerRecord(Integer key, String message, String topic) {
+
+        List<Header> recordHeaders = List.of(new RecordHeader(TRANSACTION_TYPE, "add".getBytes()));
+
+        return new ProducerRecord<Integer, String>(topic, null, key, message, recordHeaders);
+
     }
 
     public SendResult<Integer, String> sendMessageSynchronous(LibraryEvent libraryEvent, String topic) throws JsonProcessingException, ExecutionException, InterruptedException {

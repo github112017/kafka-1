@@ -165,4 +165,26 @@ public class LibraryEventsProducerTest {
         //then
         assertThrows(ExecutionException.class,()-> libraryEventsProducer.sendMessageSynchronous(libraryEvent, "sample"));
     }
+
+    @Test
+    void sendMessageWithKafkaHeaders() throws JsonProcessingException, ExecutionException, InterruptedException {
+        //given
+        Book book = new Book().builder()
+                .bookId(123)
+                .bookAuthor("Dilip")
+                .bookName("Kafka Using Spring Boot")
+                .build();
+
+        LibraryEvent libraryEvent = LibraryEvent.builder()
+                .libraryEventId(123)
+                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .book(book)
+                .build();
+
+        //when
+        SendResult<Integer, String> sendResult = libraryEventsProducer.sendMessageWithHeaders(libraryEvent, topic).get();
+
+        //then
+        assertNotNull(sendResult.getRecordMetadata().offset());
+    }
 }

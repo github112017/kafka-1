@@ -4,19 +4,30 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.learnkafka.domain.Book;
 import com.learnkafka.domain.LibraryEvent;
 import com.learnkafka.domain.LibraryEventStatusEnum;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.IntegerDeserializer;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.learnkafka.producer.LibraryEventsProducer.TRANSACTION_TYPE;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,8 +38,25 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
     @Autowired
     LibraryEventsProducer libraryEventsProducer;
 
+    @Autowired
+    EmbeddedKafkaBroker embeddedKafkaBroker;
+
     @Value("${spring.kafka.topic}")
     private String topic;
+
+    private Consumer<Integer, String> consumer;
+
+    @BeforeEach
+    void setUp(){
+        Map<String, Object> configs = new HashMap<>(KafkaTestUtils.consumerProps("group1", "false", embeddedKafkaBroker));
+        consumer = new DefaultKafkaConsumerFactory<>(configs, new IntegerDeserializer(), new StringDeserializer()).createConsumer();
+        embeddedKafkaBroker.consumeFromAllEmbeddedTopics(consumer);
+    }
+
+    @AfterEach
+    public void tearDown(){
+        consumer.close();
+    }
 
     @Test
     void sendMessageWithKey() throws JsonProcessingException, InterruptedException, ExecutionException {
@@ -164,5 +192,31 @@ public class LibraryEventsProducerEmbeddedKafkaTest {
 
         //then
         assertThrows(ExecutionException.class,()-> libraryEventsProducer.sendMessageSynchronous(libraryEvent, "sample"));
+    }
+
+    @Test
+    void sendMessageWithKafkaHeaders() throws JsonProcessingException, ExecutionException, InterruptedException {
+        //given
+        Book book = new Book().builder()
+                .bookId(123)
+                .bookAuthor("Dilip")
+                .bookName("Kafka Using Spring Boot")
+                .build();
+
+        LibraryEvent libraryEvent = LibraryEvent.builder()
+                .libraryEventId(123)
+                .eventStatus(LibraryEventStatusEnum.BOOK_ADDED)
+                .book(book)
+                .build();
+
+        //when
+        SendResult<Integer, String> sendResult = libraryEventsProducer.sendMessageWithHeaders(libraryEvent, topic).get();
+
+        //then
+        assertNotNull(sendResult.getRecordMetadata().offset());
+        ConsumerRecord<Integer, String> record = KafkaTestUtils.getSingleRecord(consumer, "library-events");
+        assertEquals(123, record.key());
+        //record.headers().headers(TRANSACTION_TYPE);
+
     }
 }
