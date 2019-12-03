@@ -24,6 +24,7 @@
 broker.id=<unique-broker-d>
 listeners=PLAINTEXT://localhost:<unique-port>
 log.dirs=/tmp/<unique-kafka-folder>
+auto.create.topics.enable=false
 ```
 
 - Example config will be like below.
@@ -32,6 +33,7 @@ log.dirs=/tmp/<unique-kafka-folder>
 broker.id=1
 listeners=PLAINTEXT://localhost:9093
 log.dirs=/tmp/kafka-logs-1
+auto.create.topics.enable=false
 ```
 
 ### Starting up the new Broker
@@ -74,12 +76,19 @@ log.dirs=/tmp/kafka-logs-1
 
 ```
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic library-events --from-beginning
 ```
 
 ### With Key
 
 ```
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning -property "key.separator= | " --property "print.key=true"
+```
+
+### With ConsumerGroup
+
+```
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic library-events --group console-consumer-73147
 ```
 
 # Advanced Kafka CLI operations:
