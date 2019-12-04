@@ -16,7 +16,7 @@ public class LibraryEventsConsumer {
     @KafkaListener(topics = {"${spring.kafka.topic}"}
     //,groupId = "abc"
     )
-    public void onMessage(ConsumerRecord<Integer, String> consumerRecord) {
+    public void onMessage(ConsumerRecord<Integer, String> consumerRecord) throws InterruptedException {
         log.info("Consumer Record is : " + consumerRecord.toString());
     }
 
@@ -26,7 +26,6 @@ public class LibraryEventsConsumer {
         consumerRecords.forEach(consumerRecord -> {
             log.info("Consumer Record is : " + consumerRecord.toString());
         });
-
     }
 */
 

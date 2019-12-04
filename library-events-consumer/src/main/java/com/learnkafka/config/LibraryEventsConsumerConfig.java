@@ -1,5 +1,6 @@
 package com.learnkafka.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 @Configuration
 @EnableKafka
+@Slf4j
 public class LibraryEventsConsumerConfig {
 
 
@@ -22,6 +24,7 @@ public class LibraryEventsConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         configurer.configure(factory, kafkaConsumerFactory);
         //factory.setConcurrency(4);
+        log.info("container properties " + factory.getContainerProperties());
         return factory;
     }
 
