@@ -60,3 +60,19 @@ doPoll() (polliTimeOut is 5000 seconds)
     }
 ```
     
+## @KafkaListener LifeCycle
+
+- The KafkaListener's lifecycle is managed by **KafkaListenerEndpointRegistry** which is a infrastructe bean.
+
+```aidl
+@Autowired
+KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+
+//Below code will list the containers it manage.
+kafkaListenerEndpointRegistry.getAllListenerContainers().forEach(messageListenerContainer -> {
+            log.info(messageListenerContainer.toString());
+            log.info("Groups id is {} ",  messageListenerContainer.getGroupId());
+});
+```
+ 
+- Check this link - https://docs.spring.io/spring-kafka/reference/html/#kafkalistener-lifecycle
