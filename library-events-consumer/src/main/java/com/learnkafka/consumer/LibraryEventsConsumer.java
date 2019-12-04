@@ -12,31 +12,13 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Slf4j
-@Component
+//@Component
 public class LibraryEventsConsumer {
-
-    @Autowired
-    KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
     @KafkaListener(topics = {"${spring.kafka.topic}"}
     //,groupId = "abc"
     )
     public void onMessage(ConsumerRecord<Integer, String> consumerRecord) throws InterruptedException {
         log.info("Consumer Record is : {} " , consumerRecord.toString());
-        log.info("Listener Container List {} " ,  kafkaListenerEndpointRegistry.getAllListenerContainers().size());
-        kafkaListenerEndpointRegistry.getAllListenerContainers().forEach(messageListenerContainer -> {
-            log.info(messageListenerContainer.toString());
-            log.info("Groups id is {} ",  messageListenerContainer.getGroupId());
-        });
     }
-
-/*
-    public void onMessage(ConsumerRecords<?,?> consumerRecords) {
-        log.info("Consumer Record is : " + consumerRecords.count());
-        consumerRecords.forEach(consumerRecord -> {
-            log.info("Consumer Record is : " + consumerRecord.toString());
-        });
-    }
-*/
-
 }
