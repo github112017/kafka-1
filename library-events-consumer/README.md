@@ -1,0 +1,17 @@
+# Spring Boot Consumer
+
+## Mandatory Inputs
+
+```
+spring:
+  profiles: local
+  kafka:
+    topic: library-events
+    consumer:
+      bootstrap-servers:
+        - localhost:9092,localhost:9093,localhost:9094
+      #enable-auto-commit: true
+      key-deserializer: org.apache.kafka.common.serialization.IntegerDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: library-events-listener-group
+```

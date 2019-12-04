@@ -15,7 +15,7 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 public class LibraryEventsConsumerConfig {
 
 
-   /* @Bean
+    @Bean
     ConcurrentKafkaListenerContainerFactory<?, ?> kafkaListenerContainerFactory(
             ConcurrentKafkaListenerContainerFactoryConfigurer configurer,
             ConsumerFactory<Object, Object> kafkaConsumerFactory) {
@@ -23,7 +23,7 @@ public class LibraryEventsConsumerConfig {
         configurer.configure(factory, kafkaConsumerFactory);
         //factory.setConcurrency(4);
         return factory;
-    }*/
+    }
 
    /* @Bean
     KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<Object, Object>> kafkaListenerContainerFactory
