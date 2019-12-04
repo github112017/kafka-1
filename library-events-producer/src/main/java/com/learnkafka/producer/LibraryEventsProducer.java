@@ -74,6 +74,7 @@ public class LibraryEventsProducer {
         List<Header> recordHeaders = List.of(new RecordHeader(EVENT_SOURCE, SCANNER.getBytes()));
 
         return new ProducerRecord<Integer, String>(topic, null, key, message, recordHeaders);
+        //return new ProducerRecord<Integer, String>(topic, null, key, message);
 
     }
 
