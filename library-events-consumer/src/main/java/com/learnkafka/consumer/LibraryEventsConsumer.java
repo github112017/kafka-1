@@ -23,17 +23,8 @@ public class LibraryEventsConsumer {
     @Autowired
     LibraryEventsConsumerService libraryEventsConsumerService;
 
-    @KafkaListener(topics = {"${spring.kafka.topic}"}
-    //,groupId = "abc"
-    )
+    @KafkaListener(topics = {"${spring.kafka.topic}"})
     public void onMessage(ConsumerRecord<Integer, String> consumerRecord) throws InterruptedException, JsonProcessingException {
         libraryEventsConsumerService.processLibraryEvent(consumerRecord);
     }
-
-  /*  @KafkaListener(topics = {"${spring.kafka.topic}"}
-            //,groupId = "abc"
-    )
-    public void onMessage(@Payload LibraryEvent libraryEvent) throws InterruptedException {
-        log.info("libraryEvent is {} " , libraryEvent);
-    }*/
 }
