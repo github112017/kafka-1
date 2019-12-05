@@ -54,6 +54,31 @@ public class LibraryEventsProducerTest {
     }
 
     @Test
+    void sendMessageWithKey_Modify() throws JsonProcessingException, InterruptedException, ExecutionException {
+
+        //given
+        Book book = new Book().builder()
+                .bookId(456)
+                .bookAuthor("Dilip")
+                .bookName("Kafka Using Spring Boot")
+                .build();
+
+        LibraryEvent libraryEvent = LibraryEvent.builder()
+                .libraryEventId(123)
+                .eventStatus(LibraryEventStatusEnum.MODIFY)
+                .book(book)
+                .build();
+
+        //when
+        ListenableFuture<SendResult<Integer, String>> listenableFuture =libraryEventsProducer.sendMessage(libraryEvent, topic);
+        SendResult<Integer, String> sendResult =  listenableFuture.get();
+
+        //then
+        System.out.println("Send Reult : " + sendResult);
+        assertNotNull(sendResult.getRecordMetadata().offset());
+    }
+
+    @Test
     void sendMessageWithNullKey() throws JsonProcessingException, InterruptedException, ExecutionException {
 
         //given
