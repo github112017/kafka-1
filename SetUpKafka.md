@@ -85,6 +85,27 @@ auto.create.topics.enable=false
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-topic --from-beginning -property "key.separator= | " --property "print.key=true"
 ```
 
+### With Key and Values
+
+- From Beginnning
+
+```
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic library-events --from-begining \
+--property key.deserializer=org.apache.kafka.common.serialization.IntegerDeserializer \
+--property value.deserialzer=org.apache.kafka.common.serialization.StringDeserializer \
+--property print.key=true \
+```
+
+
+- Latest
+
+```
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic library-events \
+--property key.deserializer=org.apache.kafka.common.serialization.IntegerDeserializer \
+--property value.deserialzer=org.apache.kafka.common.serialization.StringDeserializer \
+--property print.key=true \
+```
+
 ### With ConsumerGroup
 
 ```
