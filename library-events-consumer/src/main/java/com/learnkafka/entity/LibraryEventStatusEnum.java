@@ -1,4 +1,4 @@
-package com.learnkafka.domain;
+package com.learnkafka.entity;
 
 public enum LibraryEventStatusEnum {
     ADD,

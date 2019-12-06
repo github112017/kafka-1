@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Disabled
+//@Disabled
 public class LibraryEventsProducerTest {
 
     @Autowired
@@ -41,6 +41,31 @@ public class LibraryEventsProducerTest {
         LibraryEvent libraryEvent = LibraryEvent.builder()
                 .libraryEventId(123)
                 .eventStatus(LibraryEventStatusEnum.ADD)
+                .book(book)
+                .build();
+
+        //when
+        ListenableFuture<SendResult<Integer, String>> listenableFuture =libraryEventsProducer.sendMessage(libraryEvent, topic);
+        SendResult<Integer, String> sendResult =  listenableFuture.get();
+
+        //then
+        System.out.println("Send Reult : " + sendResult);
+        assertNotNull(sendResult.getRecordMetadata().offset());
+    }
+
+    @Test
+    void sendMessageWithKey_Modify() throws JsonProcessingException, InterruptedException, ExecutionException {
+
+        //given
+        Book book = new Book().builder()
+                .bookId(456)
+                .bookAuthor("Dilip")
+                .bookName("Kafka Using Spring Boot")
+                .build();
+
+        LibraryEvent libraryEvent = LibraryEvent.builder()
+                .libraryEventId(123)
+                .eventStatus(LibraryEventStatusEnum.MODIFY)
                 .book(book)
                 .build();
 
