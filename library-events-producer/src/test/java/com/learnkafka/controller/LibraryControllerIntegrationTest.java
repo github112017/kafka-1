@@ -32,8 +32,8 @@ import static com.learnkafka.producer.LibraryEventsProducer.SCANNER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EmbeddedKafka(ports = 9099, topics = {"library-events"}, brokerProperties = {"auto.create.topics.enable=false"})
-@TestPropertySource(properties = {"spring.kafka.producer.bootstrap-servers=localhost:9099"})
+@EmbeddedKafka(ports = 9098, topics = {"library-events"}, brokerProperties = {"auto.create.topics.enable=false"})
+@TestPropertySource(properties = {"spring.kafka.producer.bootstrap-servers=localhost:9098"})
 @AutoConfigureWebClient
 public class LibraryControllerIntegrationTest {
 

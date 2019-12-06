@@ -1,26 +1,20 @@
 package com.learnkafka.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learnkafka.domain.Book;
 import com.learnkafka.domain.LibraryEvent;
-import com.learnkafka.domain.LibraryEventStatusEnum;
 import com.learnkafka.producer.LibraryEventsProducer;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -28,8 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+@WebMvcTest(LibraryEventController.class)
 @AutoConfigureMockMvc
+@TestPropertySource(properties = {"spring.kafka.topic=library-events"})
 public class LibraryControllerUnitTest {
 
     @Autowired
@@ -38,18 +33,10 @@ public class LibraryControllerUnitTest {
     @MockBean
     LibraryEventsProducer libraryEventsProducer;
 
-    @Autowired
-    LibraryEventController libraryEventController;
+    String topic = "library-events";
 
 
     ObjectMapper objectMapper = new ObjectMapper();
-
-    String topic;
-
-    @BeforeEach
-    void setTopic() {
-        ReflectionTestUtils.setField(libraryEventController, "topic", topic);
-    }
 
     @Test
     void postLibraryEvent() throws Exception {
@@ -66,7 +53,7 @@ public class LibraryControllerUnitTest {
                 .book(book)
                 .build();
         String json = objectMapper.writeValueAsString(libraryEvent);
-        when(libraryEventsProducer.sendMessage(libraryEvent, topic)).thenReturn(null);
+        when(libraryEventsProducer.sendMessage(isA(LibraryEvent.class), eq(topic))).thenReturn(null);
 
         //expect
         mockMvc.perform(
@@ -94,7 +81,7 @@ public class LibraryControllerUnitTest {
                 .book(book)
                 .build();
         String json = objectMapper.writeValueAsString(libraryEvent);
-        when(libraryEventsProducer.sendMessage(libraryEvent, topic)).thenReturn(null);
+        when(libraryEventsProducer.sendMessage(isA(LibraryEvent.class), eq(topic))).thenReturn(null);
 
         //expect
         mockMvc.perform(
@@ -122,7 +109,8 @@ public class LibraryControllerUnitTest {
                 .book(book)
                 .build();
         String json = objectMapper.writeValueAsString(libraryEvent);
-        when(libraryEventsProducer.sendMessage(libraryEvent, topic)).thenThrow(new RuntimeException("Exception Occurred"));
+        when(libraryEventsProducer.sendMessage(isA(LibraryEvent.class), eq(topic)))
+                .thenThrow(new RuntimeException("Exception Occurred"));
 
         //expect
         mockMvc.perform(
@@ -149,7 +137,7 @@ public class LibraryControllerUnitTest {
                 .book(book)
                 .build();
         String json = objectMapper.writeValueAsString(libraryEvent);
-        when(libraryEventsProducer.sendMessage(libraryEvent, topic)).thenReturn(null);
+        when(libraryEventsProducer.sendMessage(isA(LibraryEvent.class), eq(topic))).thenReturn(null);
 
         //expect
         mockMvc.perform(
